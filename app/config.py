@@ -20,6 +20,8 @@ class Config:
                             ("filesystem" aquí).
 
     """
-    SECRET_KEY = os.environ.get('SECRET_KEY') or 'clave secreta para lecheff recetas'
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///mydatabase.db'
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
+    SECRET_KEY = os.urandom(24)
     SESSION_PERMANENT = False
     SESSION_TYPE = "filesystem"

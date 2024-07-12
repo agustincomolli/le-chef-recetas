@@ -2,12 +2,13 @@
 Contiene las rutas a cada parte de la aplicación web
 
 """
-from flask import Blueprint
+from flask import Blueprint, render_template, request, redirect, url_for
 from app.helpers import apology
+from . import db
 
-bp = Blueprint("routes", __name__)
+main = Blueprint("main", __name__)
 
-@bp.route("/")
+@main.route("/")
 def index():
     """ Página principal """
-    return apology("trabajá sorete")
+    return apology("trabajando,\n por favor espere", 403)

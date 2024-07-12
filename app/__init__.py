@@ -3,9 +3,11 @@ Inicialización de la aplicación Flask.
 
 """
 from flask import Flask
+from flask_sqlalchemy import SQLAlchemy
 from flask_session import Session
-from config import Config
+from app.config import Config
 
+db = SQLAlchemy()
 
 def create_app():
     """
@@ -15,13 +17,15 @@ def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
 
+    db.init_app(app)
+
     # Configuración
     app.config["SESSION_PERMANENT"] = False
     app.config["SESSION_TYPE"] = "filesystem"
     Session(app)
 
     # Registrar blueprints
-    from app import routes
-    app.register_blueprint(routes.bp)
+    from .routes import main as main_blueprint
+    app.register_blueprint(main_blueprint)
 
     return app
