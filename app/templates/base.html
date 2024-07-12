@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Le Chef Recetas: {% block title %}{% endblock %}</title>
+  <!-- Bootstrap -->
+   <link rel="stylesheet" href="{{ url_for('static', filename='styles/bootstrap.min.css') }}">
+   <script src="{{ url_for('static', filename='scripts/bootstrap.bundle.min.js') }}"></script>
+   <link rel="shortcut icon" href="{{ url_for('static', filename='/icons/favicon.png') }}" type="image/x-icon">
+</head>
+<body>
+  <header></header>
+  <main class="container py-5 text-center">
+    {% block main %}
+    {% endblock %}
+  </main>
+  <footer></footer>
+  
+</body>
+</html>
