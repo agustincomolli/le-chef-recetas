@@ -6,6 +6,8 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_session import Session
 from app.config import Config
+from .routes.main import main
+from .routes.auth import auth
 
 db = SQLAlchemy()
 
@@ -26,7 +28,15 @@ def create_app():
     Session(app)
 
     # Registrar blueprints
-    from .routes.main import main as main_blueprint
-    app.register_blueprint(main_blueprint)
-   
+    app.register_blueprint(main)
+    app.register_blueprint(auth)
+
+    @app.after_request
+    def after_request(response):
+        """Ensure responses aren't cached"""
+        response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+        response.headers["Expires"] = 0
+        response.headers["Pragma"] = "no-cache"
+        return response
+
     return app
