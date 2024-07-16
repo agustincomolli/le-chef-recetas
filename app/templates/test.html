@@ -10,42 +10,55 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='styles/bootstrap-icons.min.css') }}">
   <script src="{{ url_for('static', filename='scripts/bootstrap.bundle.min.js') }}"></script>
   <!-- Mis estilos -->
-   <link rel="stylesheet" href="{{ url_for('static', filename='/styles/styles.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='/styles/styles.css') }}">
+  <style>
+    .equal-width {
+      flex: 1 0 0;
+    }
+    .navbar-brand {
+      max-width: 100%;
+    }
+  </style>
 </head>
 <body>
   <header>
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
       <div class="container-fluid">
-        <div class="d-flex justify-content-between align-items-center w-100">
+        <div class="d-flex align-items-center justify-content-between w-100">
           <!-- Logo y marca -->
-          <a href="/" class="navbar-brand d-flex align-items-center">
-            <img class="rounded-circle" src="{{ url_for('static', filename='images/le-chef.webp') }}" alt="Logo" height="64"
-              width="64">
-            <span class="ms-2 fs-3">Le Chef</span>
-            <span class="mt-5 ms-2 fs-5 align-self-end d-none d-sm-inline fw-light">Recetas de cocina</span>
-          </a>
+          <div class="equal-width d-flex justify-content-start">
+            <a href="/" class="navbar-brand d-flex align-items-center">
+              <img class="rounded-circle" src="{{ url_for('static', filename='images/le-chef.webp') }}" alt="Logo" height="64" width="64">
+              <span class="ms-2 fs-3">Le Chef</span>
+              <span class="mt-5 ms-2 fs-5 align-self-end d-none d-sm-inline fw-light">Recetas de cocina</span>
+            </a>
+          </div>
   
-          <form class="d-none d-sm-flex mx-auto mt-2 mt-lg-0 search-bar">
+          <!-- Barra de búsqueda -->
+          <form class="d-none d-sm-flex mx-2 mt-2 mt-lg-0 search-bar">
             <input name="query" class="form-control me-2" type="search" placeholder="Buscar" aria-label="Search">
             <button class="btn btn-outline-success" type="submit">
               <i class="bi bi-search"></i>
             </button>
           </form>
   
-          {% if session["user_id"] %}
-          {% else %}
-          <ul class="d-none d-sm-flex navbar-nav ms-auto">
-            <li class="nav-item"><a href="/register" class="nav-link">Registrarse</a></li>
-            <li class="nav-item"><a href="/login" class="nav-link">Iniciar sesión</a></li>
-          </ul>
-          {% endif %}
+          <!-- Enlaces de autenticación y menú hamburguesa -->
+          <div class="equal-width d-flex justify-content-end align-items-center">
+            {% if session["user_id"] %}
+            {% else %}
+            <div class="d-none d-sm-flex me-3">
+              <a href="/register" class="nav-link me-3">Registrarse</a>
+              <a href="/login" class="nav-link">Iniciar sesión</a>
+            </div>
+            {% endif %}
+            <!-- Menú hamburguesa -->
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar"
+              aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
+              <span class="navbar-toggler-icon"></span>
+            </button>
+          </div>
         </div>
   
-        <!-- Menú hamburguesa -->
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar"
-          aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
-          <span class="navbar-toggler-icon"></span>
-        </button>
         <div class="collapse navbar-collapse" id="navbar">
           {% if session["user_id"] %}
           {% else %}
@@ -59,7 +72,7 @@
     </nav>
     <nav class="navbar navbar-light bg-light">
       <div class="container-fluid">
-        <!-- Barra de búsqueda -->
+        <!-- Barra de búsqueda móvil -->
         <ul class="d-block d-sm-none nav justify-content-center w-100">
           <li class="nav-item">
             <form class="d-flex mx-auto mt-2 mt-lg-0 search-bar">
@@ -70,6 +83,7 @@
             </form>
           </li>
         </ul>
+        <!-- Categorías -->
         <ul class="nav justify-content-center w-100 mt-2">
           <li class="nav-item"><a href="#" class="nav-link">Entradas</a></li>
           <li class="nav-item"><a href="#" class="nav-link">Platos principales</a></li>
@@ -84,6 +98,5 @@
     {% endblock %}
   </main>
   <footer></footer>
-
 </body>
 </html>

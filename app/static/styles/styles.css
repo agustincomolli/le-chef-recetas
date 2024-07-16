@@ -6,14 +6,20 @@
 
 .navbar-brand {
   font-family: 'Pacifico', cursive;
+  max-width: 100%;
 }
 
 .search-bar {
   width: 300px;
 }
 
+  .equal-width {
+    flex: 1 0 0;
+  }
+
+
 @media screen and (min-width: 450px) {
   .search-bar {
     width: 400px;
-  }
+  }    
 }

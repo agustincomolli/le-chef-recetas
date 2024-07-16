@@ -8,8 +8,16 @@ Disculpa
 <!-- https://memegen.link/ -->
 <!-- https://knowyourmeme.com/memes/grumpy-cat -->
 
-<!-- Use my custom image backround on meme -->
-<img alt="{{ top }}" class="border img-fluid"
-    src="https://api.memegen.link/images/custom/{{ top | urlencode }}/{{ bottom | urlencode }}.jpg?background=https://i.imgur.com/150G0y1.jpeg&width=400"
-    title="{{ top }}">
+<div class="d-flex flex-column align-items-center">
+    <!-- Use my custom image background on meme -->
+    <img alt="{{ top }}" class="border img-fluid mb-4"
+        src="https://api.memegen.link/images/custom/{{ top | urlencode }}/{{ bottom | urlencode }}.jpg?background=https://i.imgur.com/150G0y1.jpeg&width=400"
+        title="{{ top }}">
+
+    <!-- Spinner debajo de la imagen -->
+    <div class="spinner-border text-primary" role="status" id="colorful-spinner">
+        <span class="visually-hidden">Loading...</span>
+    </div>
+</div>
+<script src="{{ url_for('static', filename='/scripts/apology.js') }}"></script>
 {% endblock %}

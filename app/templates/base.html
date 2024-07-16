@@ -5,44 +5,70 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Le Chef Recetas: {% block title %}{% endblock %}</title>
   <link rel="shortcut icon" href="{{ url_for('static', filename='/icons/favicon.png') }}" type="image/x-icon">
-  <!-- Bootstrap -->
+  <!-- Bootstrap en modo local -->
   <link rel="stylesheet" href="{{ url_for('static', filename='styles/bootstrap.min.css') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='styles/bootstrap-icons.min.css') }}">
   <script src="{{ url_for('static', filename='scripts/bootstrap.bundle.min.js') }}"></script>
   <!-- Mis estilos -->
-   <link rel="stylesheet" href="{{ url_for('static', filename='/styles/styles.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='/styles/styles.css') }}">
 </head>
 <body>
   <header>
+    <!-- Barra de navegación -->
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
       <div class="container-fluid">
-        <!-- Logo y marca -->
-        <a href="/" class="navbar-brand d-flex align-items-center">
-          <img class="rounded-circle" src="{{ url_for('static', filename='images/le-chef.webp') }}" alt="Logo" height="64"
-            width="64">
-          <span class="ms-2 fs-3">Le Chef</span>
-          <span class="mt-5 ms-2 fs-5 align-self-end d-none d-sm-inline fw-light">Recetas de cocina</span>
-        </a>
-        
-        <!-- Menú hamburguesa -->
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar"
-          aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
-          <span class="navbar-toggler-icon"></span>
-        </button>
+        <div class="d-flex align-items-center justify-content-between w-100">
+          <!-- Logo y marca: Siempre a la izquierda -->
+          <!-- El subtítulo se oculta en modo responsivo -->
+          <div class="equal-width d-flex justify-content-start">
+            <a href="/" class="navbar-brand d-flex align-items-center">
+              <img class="rounded-circle" src="{{ url_for('static', filename='images/le-chef.webp') }}" alt="Logo" height="64" width="64">
+              <span class="ms-2 fs-3">Le Chef</span>
+              <span class="mt-5 ms-2 fs-5 align-self-end d-none d-sm-inline fw-light">Recetas de cocina</span>
+            </a>
+          </div>
+  
+          <!-- Barra de búsqueda: Siempre en el centro -->
+          <!-- Se oculta en modo responsivo y se muestra debajo del logo -->
+          <form class="d-none d-sm-flex mx-2 mt-2 mt-lg-0 search-bar">
+            <input name="query" class="form-control me-2" type="search" placeholder="Buscar" aria-label="Search">
+            <button class="btn btn-outline-success" type="submit">
+              <i class="bi bi-search"></i>
+            </button>
+          </form>
+  
+          <!-- Enlaces de autenticación y menú hamburguesa: Siempre a la derecha -->
+          <div class="equal-width d-flex justify-content-end align-items-center">
+            {% if session["user_id"] %}
+            {% else %}
+              <div class="d-none d-sm-flex me-3">
+                <a href="/register" class="nav-link me-3">Registrarse</a>
+                <a href="/login" class="nav-link">Iniciar sesión</a>
+              </div>
+            {% endif %}
+            <!-- Menú hamburguesa para modo responsivo -->
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar"
+              aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
+              <span class="navbar-toggler-icon"></span>
+            </button>
+          </div>
+        </div>
+  
+        <!-- Menú hamburguesa desplegado: Opciones de usuario a la derecha -->
         <div class="collapse navbar-collapse" id="navbar">
           {% if session["user_id"] %}
           {% else %}
-          <ul class="navbar-nav ms-auto">
-            <li class="nav-item"><a href="/register" class="nav-link">Registrarse</a></li>
-            <li class="nav-item"><a href="/login" class="nav-link">Iniciar sesión</a></li>
-          </ul>
+            <ul class="d-flex d-sm-none navbar-nav ms-auto">
+              <li class="nav-item"><a href="/register" class="nav-link">Registrarse</a></li>
+              <li class="nav-item"><a href="/login" class="nav-link">Iniciar sesión</a></li>
+            </ul>
           {% endif %}
         </div>
       </div>
     </nav>
     <nav class="navbar navbar-light bg-light">
       <div class="container-fluid">
-        <!-- Barra de búsqueda -->
+        <!-- Barra de búsqueda móvil: Se muestra debajo del logo en modo responsivo -->
         <ul class="d-block d-sm-none nav justify-content-center w-100">
           <li class="nav-item">
             <form class="d-flex mx-auto mt-2 mt-lg-0 search-bar">
@@ -53,6 +79,7 @@
             </form>
           </li>
         </ul>
+        <!-- Categorías: Siempre centradas -->
         <ul class="nav justify-content-center w-100 mt-2">
           <li class="nav-item"><a href="#" class="nav-link">Entradas</a></li>
           <li class="nav-item"><a href="#" class="nav-link">Platos principales</a></li>
@@ -67,6 +94,5 @@
     {% endblock %}
   </main>
   <footer></footer>
-
 </body>
 </html>
