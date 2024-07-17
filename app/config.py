@@ -20,7 +20,7 @@ class Config:
                             ("filesystem" aquí).
 
     """
-    SQLALCHEMY_DATABASE_URI = 'sqlite:///mydatabase.db'
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///data/recipes.db'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SECRET_KEY = os.urandom(24)
     SESSION_PERMANENT = False

@@ -27,6 +27,10 @@ def create_app():
     app.config["SESSION_TYPE"] = "filesystem"
     Session(app)
 
+    with app.app_context():
+        from app.models import User
+        db.create_all()
+
     # Registrar blueprints
     app.register_blueprint(main)
     app.register_blueprint(auth)
