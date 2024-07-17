@@ -5,7 +5,7 @@ Inicialización de la aplicación Flask.
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_session import Session
-from app.config import Config
+from .config import Config
 from .routes.main import main
 from .routes.auth import auth
 
@@ -28,7 +28,6 @@ def create_app():
     Session(app)
 
     with app.app_context():
-        from app.models import User
         db.create_all()
 
     # Registrar blueprints

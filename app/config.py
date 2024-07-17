@@ -6,6 +6,8 @@ relacionadas con la gestión de sesiones.
 """
 import os
 
+basedir = os.path.abspath(os.path.dirname(__file__))
+
 
 class Config:
     """
@@ -20,7 +22,8 @@ class Config:
                             ("filesystem" aquí).
 
     """
-    SQLALCHEMY_DATABASE_URI = 'sqlite:///data/recipes.db'
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///' + \
+        os.path.join(basedir, 'data', 'recipes.db')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SECRET_KEY = os.urandom(24)
     SESSION_PERMANENT = False
