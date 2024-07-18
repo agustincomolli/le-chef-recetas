@@ -21,7 +21,7 @@ class User(db.Model):
     username = db.Column(db.String(20), unique=True, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
     password = db.Column(db.String(), nullable=False)
-    avatar = db.Column(db.String(), nullable=False)
+    avatar = db.Column(db.LargeBinary, nullable=False)
 
     def __repr__(self) -> str:
-        return f"User('{self.username}', '{self.email}', '{self.avatar}')"
+        return f"User('{self.username}', '{self.email}')"
