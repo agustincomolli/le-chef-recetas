@@ -18,7 +18,10 @@ class Step(db.Model):
         recipe_id (int): Identificador de la receta asociada al paso 
             (clave foránea a la tabla "recipe.id"). Este campo es obligatorio.
     """
+    __tablename__ = "steps"
     id = db.Column(db.Integer, primary_key=True)
     content = db.Column(db.Text, nullable=False)
-    recipe_id = db.Column(db.Integer, db.ForeignKey("recipe.id"), 
+    # Clave foránea y relación con Recipe
+    recipe_id = db.Column(db.Integer, db.ForeignKey("recipes.id"), 
                           nullable=False)
+    recipe = db.relationship("Recipe", back_populates="recipes")

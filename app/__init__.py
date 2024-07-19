@@ -9,6 +9,7 @@ from .config import Config
 from .routes.main import main
 from .routes.auth import auth
 
+
 db = SQLAlchemy()
 
 
@@ -42,6 +43,22 @@ def create_app():
     app.register_blueprint(main)
     app.register_blueprint(auth)
 
+    # pylint: disable=import-outside-toplevel
+    from .utils.database import get_categories
+    @app.context_processor
+    def inject_categorias():
+        """
+        Agrega la lista de categorías al contexto de la plantilla.
+
+        Esta función es un procesador de contexto de Flask que inserta la lista de 
+        categorías en el contexto global de las plantillas, permitiendo que esté 
+        disponible para su uso en cualquier plantilla renderizada.
+
+        Returns:
+            dict: Un diccionario con la clave 'categories' que contiene la lista de categorías.
+        """
+        return {'categories': get_categories()}
+
     @app.after_request
     def after_request(response):
         """Ensure responses aren't cached"""
@@ -70,5 +87,7 @@ def init_db():
 
     # pylint: disable=import-outside-toplevel
     # pylint: disable=unused-import
-    from .models import Ingredient, Recipe, Step, User
+    from .models import Category, Ingredient, Recipe, Step, User
+    from .utils.database import insert_categories
     db.create_all()
+    insert_categories()

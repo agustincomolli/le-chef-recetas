@@ -16,12 +16,16 @@ class User(db.Model):
         password (str): Contraseña cifrada del usuario.
         avatar (str): URL o ruta al avatar del usuario.
     """
-
+    __tablename__ = "users"
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(20), unique=True, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
     password = db.Column(db.String(), nullable=False)
     avatar = db.Column(db.LargeBinary, nullable=False)
+
+    # Relación uno a muchos con Recipe
+    recipes = db.relationship("Recipe", back_populates="user", 
+                              lazy="dynamic", cascade="all, delete-orphan")
 
     def __repr__(self) -> str:
         return f"User('{self.username}', '{self.email}')"

@@ -81,10 +81,9 @@
         </ul>
         <!-- Categorías: Siempre centradas -->
         <ul class="nav justify-content-center w-100 mt-2">
-          <li class="nav-item"><a href="#" class="nav-link">Entradas</a></li>
-          <li class="nav-item"><a href="#" class="nav-link">Platos principales</a></li>
-          <li class="nav-item"><a href="#" class="nav-link">Bebidas</a></li>
-          <li class="nav-item"><a href="#" class="nav-link">Postres</a></li>
+          {% for category in categories %}
+            <li class="nav-item"><a href="#" class="nav-link">{{ category }}</a></li>
+          {% endfor %}
         </ul>
       </div>
     </nav>
