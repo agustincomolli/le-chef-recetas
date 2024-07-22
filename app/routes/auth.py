@@ -4,6 +4,7 @@ incluyendo el inicio de sesión, cierre de sesión y registro.
 
 """
 from flask import Blueprint, request, redirect, render_template, session
+from flask_session import Session
 from werkzeug.security import check_password_hash, generate_password_hash
 from app.utils.helpers import apology
 
@@ -28,6 +29,12 @@ def login():
         - Una redirección a una página designada después del inicio de sesión exitoso (POST)
         - Un mensaje de error (POST) si el inicio de sesión falla
     """
+    # Olvidar cualquier usuario.
+    session.clear()
+    if request.method == "POST":
+        pass
+    else:
+        return render_template("login.html")
     # Código de la función login aquí
     return apology("Estamos trabajando en ello")
 

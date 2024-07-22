@@ -28,6 +28,7 @@ class Recipe(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(), nullable=False)
     description = db.Column(db.String(100))
+    image_url = db.Column(db.String(200), nullable=False)
     servings = db.Column(db.Integer)
     prep_time = db.Column(db.Integer)
     prep_time_unit = db.Column(db.String(10))

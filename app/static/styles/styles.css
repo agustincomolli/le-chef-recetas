@@ -1,3 +1,5 @@
+@import url("./partials/login.css");
+
 @font-face {
   font-family: "Pacifico";
   src: url("../fonts/pacifico-regular.woff2") format("woff2"),

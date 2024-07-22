@@ -12,22 +12,23 @@
   <!-- Mis estilos -->
   <link rel="stylesheet" href="{{ url_for('static', filename='/styles/styles.css') }}">
 </head>
-<body>
+<body class="d-flex flex-column justify-content-center min-vh-100">
   <header>
     <!-- Barra de navegación -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <nav class="navbar navbar-expand-lg navbar-light bg-light pb-0">
       <div class="container-fluid">
         <div class="d-flex align-items-center justify-content-between w-100">
           <!-- Logo y marca: Siempre a la izquierda -->
           <!-- El subtítulo se oculta en modo responsivo -->
           <div class="equal-width d-flex justify-content-start">
             <a href="/" class="navbar-brand d-flex align-items-center">
-              <img class="rounded-circle" src="{{ url_for('static', filename='images/le-chef.webp') }}" alt="Logo" height="64" width="64">
+              <img class="rounded-circle" src="{{ url_for('static', filename='images/le-chef.webp') }}" alt="Logo"
+                height="64" width="64">
               <span class="ms-2 fs-3">Le Chef</span>
-              <span class="mt-5 ms-2 fs-5 align-self-end d-none d-sm-inline fw-light">Recetas de cocina</span>
+              <span class="mt-5 ms-2 fs-5 align-self-end d-none d-md-inline fw-light">Recetas de cocina</span>
             </a>
           </div>
-  
+
           <!-- Barra de búsqueda: Siempre en el centro -->
           <!-- Se oculta en modo responsivo y se muestra debajo del logo -->
           <form class="d-none d-sm-flex mx-2 mt-2 mt-lg-0 search-bar">
@@ -36,15 +37,15 @@
               <i class="bi bi-search"></i>
             </button>
           </form>
-  
+
           <!-- Enlaces de autenticación y menú hamburguesa: Siempre a la derecha -->
           <div class="equal-width d-flex justify-content-end align-items-center">
             {% if session["user_id"] %}
             {% else %}
-              <div class="d-none d-sm-flex me-3">
-                <a href="/register" class="nav-link me-3">Registrarse</a>
-                <a href="/login" class="nav-link">Iniciar sesión</a>
-              </div>
+            <div class="d-none d-sm-flex me-3">
+              <a href="/register" class="nav-link me-3">Registrarse</a>
+              <a href="/login" class="nav-link">Iniciar sesión</a>
+            </div>
             {% endif %}
             <!-- Menú hamburguesa para modo responsivo -->
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar"
@@ -53,20 +54,20 @@
             </button>
           </div>
         </div>
-  
+
         <!-- Menú hamburguesa desplegado: Opciones de usuario a la derecha -->
         <div class="collapse navbar-collapse" id="navbar">
           {% if session["user_id"] %}
           {% else %}
-            <ul class="d-flex d-sm-none navbar-nav ms-auto">
-              <li class="nav-item"><a href="/register" class="nav-link">Registrarse</a></li>
-              <li class="nav-item"><a href="/login" class="nav-link">Iniciar sesión</a></li>
-            </ul>
+          <ul class="d-flex d-sm-none navbar-nav ms-auto">
+            <li class="nav-item"><a href="/register" class="nav-link">Registrarse</a></li>
+            <li class="nav-item"><a href="/login" class="nav-link">Iniciar sesión</a></li>
+          </ul>
           {% endif %}
         </div>
       </div>
     </nav>
-    <nav class="navbar navbar-light bg-light">
+    <nav class="navbar navbar-light bg-light pt-0">
       <div class="container-fluid">
         <!-- Barra de búsqueda móvil: Se muestra debajo del logo en modo responsivo -->
         <ul class="d-block d-sm-none nav justify-content-center w-100">
@@ -82,16 +83,48 @@
         <!-- Categorías: Siempre centradas -->
         <ul class="nav justify-content-center w-100 mt-2">
           {% for category in categories %}
-            <li class="nav-item"><a href="#" class="nav-link">{{ category }}</a></li>
+          <li class="nav-item"><a href="#" class="nav-link">{{ category }}</a></li>
           {% endfor %}
         </ul>
       </div>
     </nav>
   </header>
-  <main class="container py-5 text-center">
+  <main class="flex-grow-1 container py-4 text-center">
     {% block main %}
     {% endblock %}
   </main>
-  <footer></footer>
+  <footer class="bg-dark text-light pb-2">
+    <div class="container mt-0 pt-2">
+      <div class="row">
+        <!-- Breve descripción o lema -->
+        <div class="col-md-5 mb-0">
+          <h5>Le Chef Recetas</h5>
+          <p>Las mejores recetas para todos los gustos. Encuentra tus platillos favoritos y descubre nuevas delicias.
+          </p>
+        </div>
+        <!-- Enlaces a secciones principales -->
+        <div class="col-md-4 mb-0">
+          <h5>Enlaces</h5>
+          <ul class="list-unstyled">
+            <li><a href="#" class="text-light">Inicio</a></li>
+            <li><a href="#" class="text-light">Sobre Nosotros</a></li>
+            <li><a href="#" class="text-light">Contacto</a></li>
+          </ul>
+        </div>
+        <!-- Íconos de redes sociales -->
+        <div class="col-md-3 mb-0">
+          <h5>Síguenos</h5>
+          <a href="#" class="text-light me-2"><i class="bi bi-facebook"></i></a>
+          <a href="#" class="text-light me-2"><i class="bi bi-twitter"></i></a>
+          <a href="#" class="text-light me-2"><i class="bi bi-instagram"></i></a>
+          <a href="#" class="text-light me-2"><i class="bi bi-youtube"></i></a>
+        </div>
+        <!-- Créditos y derechos de autor -->
+        <div class="text-center pt-2 pt-sm-0">
+          <span><small>2024 - Agustín Comolli &copy; Todos los derechos reservados.</small></span>
+        </div>
+      </div>
+    </div>
+  </footer>
 </body>
 </html>
