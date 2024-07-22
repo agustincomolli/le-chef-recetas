@@ -6,9 +6,9 @@
   <title>Le Chef Recetas: {% block title %}{% endblock %}</title>
   <link rel="shortcut icon" href="{{ url_for('static', filename='/icons/favicon.png') }}" type="image/x-icon">
   <!-- Bootstrap en modo local -->
-  <link rel="stylesheet" href="{{ url_for('static', filename='styles/bootstrap.min.css') }}">
-  <link rel="stylesheet" href="{{ url_for('static', filename='styles/bootstrap-icons.min.css') }}">
-  <script src="{{ url_for('static', filename='scripts/bootstrap.bundle.min.js') }}"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles/bootstrap/bootstrap.min.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles/bootstrap/bootstrap-icons.min.css') }}">
+  <script src="{{ url_for('static', filename='scripts/bootstrap/bootstrap.bundle.min.js') }}"></script>
   <!-- Mis estilos -->
   <link rel="stylesheet" href="{{ url_for('static', filename='/styles/styles.css') }}">
 </head>
@@ -99,7 +99,8 @@
         <!-- Breve descripción o lema -->
         <div class="col-md-5 mb-0">
           <h5>Le Chef Recetas</h5>
-          <p>Las mejores recetas para todos los gustos. Encuentra tus platillos favoritos y descubre nuevas delicias.
+          <p>
+            Las mejores recetas para todos los gustos. Encuentra tus platos favoritos y descubre nuevas delicias.
           </p>
         </div>
         <!-- Enlaces a secciones principales -->

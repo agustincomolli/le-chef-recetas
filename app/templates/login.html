@@ -6,7 +6,7 @@ Iniciar sesión
 
 {% block main %}
   <h4 class="mb-3">Iniciar sesión</h4>
-  <form action="/login" method="post" class="d-flex flex-column align-items-center mb-5">
+  <form action="/login" method="post" class="d-flex flex-column align-items-center mb-5 border border-2 rounded-3 py-5 mx-auto">
     <div class="form-group mb-3 d-flex flex-column align-items-start">
       <label for="username" class="form-label">Usuario:</label>
       <input type="text" name="username" id="username" class="form-control" autocomplete="off" autofocus>
@@ -15,6 +15,6 @@ Iniciar sesión
       <label for="password" class="form-label">Contraseña:</label>
       <input type="password" name="password" id="password" class="form-control">
     </div>
-    <button type="submit" class="btn btn-primary">Iniciar sesión</button>
+    <button type="submit" class="btn btn-primary mt-3">Iniciar sesión</button>
   </form>
 {% endblock %}
