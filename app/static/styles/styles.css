@@ -6,6 +6,11 @@
     url("../fonts/pacifico-regular.woff") format("woff");
 }
 
+#categories {
+  box-shadow: 0 0.5rem 0.5rem rgba(0, 0, 0, 0.15),
+    0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+}
+
 .navbar-brand {
   font-family: 'Pacifico', cursive;
   max-width: 100%;
@@ -15,13 +20,13 @@
   width: 300px;
 }
 
-  .equal-width {
-    flex: 1 0 0;
-  }
+.equal-width {
+  flex: 1 0 0;
+}
 
 
 @media screen and (min-width: 450px) {
   .search-bar {
     width: 400px;
-  }    
+  }
 }
