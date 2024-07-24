@@ -13,7 +13,7 @@ def insert_categories() -> None:
     Returns:
         None
     """
-    categories = ["Bebidas", "Entradas", "Platos principales", "Postres", "Otros"]
+    categories = ["Ultimas", "Bebidas", "Entradas", "Platos principales", "Postres", "Otros"]
     # Iniciar una transacción.
     with db.engine.begin() as connection:
         # Si hay categorías, salir de la función.
