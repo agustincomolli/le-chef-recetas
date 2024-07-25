@@ -13,7 +13,8 @@ def insert_categories() -> None:
     Returns:
         None
     """
-    categories = ["Ultimas", "Bebidas", "Entradas", "Platos principales", "Postres", "Otros"]
+    categories = ["Ultimas", "Bebidas", "Entradas",
+                  "Platos principales", "Postres", "Otros"]
     # Iniciar una transacción.
     with db.engine.begin() as connection:
         # Si hay categorías, salir de la función.
@@ -39,3 +40,57 @@ def get_categories() -> list[str]:
     result = db.session.execute(text("SELECT name FROM categories;"))
     categories = [category[0] for category in result.fetchall()]
     return categories
+
+
+def is_unique_username(username: str) -> bool:
+    """
+    Verifica si un nombre de usuario es único en la base de datos.
+
+    Esta función consulta la tabla 'users' para determinar si el nombre de usuario 
+    proporcionado ya existe. Si existe, retorna False; de lo contrario, retorna True.
+
+    Args:
+        username (str): El nombre de usuario a verificar.
+
+    Returns:
+        bool: True si el nombre de usuario es único, False si ya existe.
+    """
+    # Iniciar una transacción.
+    with db.engine.begin() as connection:
+        # Ejecutar la consulta para verificar si el nombre de usuario existe.
+        result = connection.execute(text("SELECT id FROM users WHERE username = :username"),
+                                    {'username': username}).fetchone()
+        if result:
+            return False
+    return True
+
+
+def is_unique_email(email: str) -> bool:
+    """
+    Verifica si un correo electrónico es único en la base de datos.
+
+    Esta función consulta la tabla 'users' para determinar si el email 
+    proporcionado ya existe. Si existe, retorna False; de lo contrario, retorna True.
+
+    Args:
+        email (str): El email a verificar.
+
+    Returns:
+        bool: True si el email es único, False si ya existe.
+    """
+    # Iniciar una transacción.
+    with db.engine.begin() as connection:
+        # Ejecutar la consulta para verificar si el nombre de usuario existe.
+        result = connection.execute(text("SELECT id FROM users WHERE email = :email"),
+                                    {'email': email}).fetchone()
+        if result:
+            return False
+    return True
+
+
+def add_user(username, email, password, profile_image) -> int:
+    # Iniciar una transacción.
+    with db.engine.begin() as connection:
+        connection.execute(text(""))
+
+    return 1

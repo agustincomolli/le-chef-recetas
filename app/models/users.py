@@ -14,14 +14,14 @@ class User(db.Model):
         username (str): Nombre de usuario único del usuario.
         email (str): Dirección de correo electrónico única del usuario.
         password (str): Contraseña cifrada del usuario.
-        avatar (str): URL o ruta al avatar del usuario.
+        profile_image (str): Imagen de perfil del usuario.
     """
     __tablename__ = "users"
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(20), unique=True, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
     password = db.Column(db.String(), nullable=False)
-    avatar = db.Column(db.LargeBinary, nullable=False)
+    profile_image = db.Column(db.LargeBinary, nullable=False)
 
     # Relación uno a muchos con Recipe
     recipes = db.relationship("Recipe", back_populates="user", 

@@ -9,15 +9,16 @@ Registrarse
 <form action="/register" method="post" class="d-flex flex-column align-items-center mb-5 py-3 mx-auto needs-validation"
   novalidate>
   <div class="border border-warning rounded-circle bg-warning bg-opacity-25 p-2 mb-2">
-    <img src="{{ url_for('static', filename='/images/chef-default.webp') }}" alt="Avatar" width="80" height="80">
+    <img src="{{ url_for('static', filename='/images/chef-default.webp') }}" alt="Avatar" width="100" height="100"
+      id="img-profile-image" class="rounded-circle">
   </div>
   <div class="form-group mb-3 d-flex flex-column align-items-start">
-    <label for="avatar" class="form-label">Imagen de perfil:</label>
-    <input type="file" name="avatar" id="avatar" class="form-control register-input"
-      accept="image/.png, .jpg, .jpeg, .gif, .webp" aria-describedby="avatarHelpBlock" >
-      <div id="avatarHelpBlock" class="form-text">
-        Selecciona el archivo que tendrá la imagen de tu perfil.
-      </div>
+    <label for="input-profile-image" class="form-label">Imagen de perfil:</label>
+    <input type="file" name="input-profile-image" id="input-profile-image" class="form-control register-input"
+      accept="image/, .png, .jpg, .jpeg, .gif, .webp" aria-describedby="profile-image-help-block">
+    <div id="profile-image-help-block" class="form-text">
+      Selecciona el archivo que tendrá la imagen de tu perfil.
+    </div>
   </div>
   <div class="form-group mb-3 d-flex flex-column align-items-start">
     <label for="username" class="form-label">Usuario:</label>
@@ -38,13 +39,13 @@ Registrarse
   <div class="form-group mb-3 d-flex flex-column align-items-start">
     <label for="password" class="form-label">Contraseña:</label>
     <input type="password" name="password" id="password" class="form-control register-input"
-      aria-describedby="passwordHelpBlock" minlength="8" maxlength="20" required>
-      <div id="passwordHelpBlock" class="form-text">
-        Su contraseña debe tener entre 8 y 20 caracteres.
-      </div>
-      <div class="invalid-feedback text-start">
-        La contraseña no cumple con los requisitos mínimos.
-      </div>
+      aria-describedby="password-help-block" minlength="8" maxlength="20" required>
+    <div id="password-help-block" class="form-text">
+      Su contraseña debe tener entre 8 y 20 caracteres.
+    </div>
+    <div class="invalid-feedback text-start">
+      La contraseña no cumple con los requisitos mínimos.
+    </div>
   </div>
   <div class="form-group mb-3 d-flex flex-column align-items-start">
     <label for="confirmation" class="form-label">Repetir contraseña:</label>
@@ -58,4 +59,5 @@ Registrarse
 </form>
 
 <script src="{{ url_for('static', filename='/scripts/custom-validation.js') }}"></script>
+<script src="{{ url_for('static', filename='/scripts/register.js') }}"></script>
 {% endblock %}

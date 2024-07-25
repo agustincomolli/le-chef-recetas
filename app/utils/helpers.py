@@ -83,7 +83,7 @@ def convert_to_webp(input_path, output_path=None):
         print(f"Error al abrir o guardar la imagen: {e}")
 
 
-def resize_image(input_path, output_path=None, new_size=(80, 80)):
+def resize_image(input_path, output_path=None, new_size=(100, 100)):
     """
     Redimensiona una imagen.
 
@@ -93,7 +93,7 @@ def resize_image(input_path, output_path=None, new_size=(80, 80)):
             Si no se proporciona, la imagen redimensionada se retorna como un objeto 
             PIL.Image.Image.
         new_size (tuple, optional): Tamaño nuevo de la imagen como una tupla (ancho, alto). 
-            Por defecto es (80, 80).
+            Por defecto es (100, 100).
 
     Returns:
         PIL.Image.Image or None: Si no se proporciona un 'output_path', retorna el objeto de imagen 
