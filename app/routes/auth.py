@@ -5,19 +5,21 @@ incluyendo el inicio de sesión, cierre de sesión y registro.
 """
 import tempfile
 import os
-from flask import Blueprint, request, redirect, render_template, session, current_app
+from flask import Blueprint, request, redirect, render_template, session, flash, current_app
 from werkzeug.security import check_password_hash, generate_password_hash
 from app.utils.helpers import apology, convert_to_webp, resize_image
-from app.utils.database import add_user, is_unique_username, is_unique_email
+from app.utils.database import add_user, get_user, is_unique_username, is_unique_email
 
 
 # Error codes.
-ERROR_MUST_PROVIDE_USERNAME = "Ingrese un nombre de usuario"
-ERROR_MUST_PROVIDE_EMAIL = "Ingrese un correo electrónico válido"
-ERROR_MUST_PROVIDE_PASSWORD = "Ingrese una contraseña"
-ERROR_MUST_REPEAT_PASSWORD = "Debe repetir la contraseña"
+ERROR_MUST_PROVIDE_USERNAME = "Ingresa tu nombre de usuario"
+ERROR_MUST_PROVIDE_EMAIL = "Ingresa un correo electrónico válido"
+ERROR_MUST_PROVIDE_PASSWORD = "Ingresa tu contraseña"
+ERROR_MUST_REPEAT_PASSWORD = "Debes repetir la contraseña"
 ERROR_NOT_EQUAL_PASSWORD = "Ambas contraseñas deben ser iguales"
 ERROR_USER_EXIST = "El usuario ya existe"
+ERROR_USER_NOT_EXIST = "El usuario no existe"
+ERROR_INCORRECT_PASSWORD = "La contraseña es incorrecta"
 ERROR_EMAIL_EXIST = "El correo electrónico ya existe"
 ERROR_ADD_USER = 1
 
@@ -42,14 +44,39 @@ def login():
         - Una redirección a una página designada después del inicio de sesión exitoso (POST)
         - Un mensaje de error (POST) si el inicio de sesión falla
     """
-    # Olvidar cualquier usuario.
+    # Cerrar cualquier sesión de usuario que pueda estar abierta.
     session.clear()
     if request.method == "POST":
-        pass
+        username = request.form.get("username")
+        password = request.form.get("password")
+
+        # Comprobar que se proporcionó un usuario.
+        if not username:
+            return apology(ERROR_MUST_PROVIDE_USERNAME, 403)
+        # Comprobar que se proporcionó una contraseña.
+        if not password:
+            return apology(ERROR_MUST_PROVIDE_PASSWORD, 403)
+
+        user = get_user(username)
+        print(user)
+        # Comprobar si el usuario es correcto.
+        if not user:
+            flash(ERROR_USER_NOT_EXIST, "warning")
+            return render_template("login.html")
+        # Comprobar la contraseña.
+        if not check_password_hash(user["password"], password):
+            flash(ERROR_INCORRECT_PASSWORD, "warning")
+            return render_template("login.html")
+
+        # Guardar datos del usuario.
+        session["user_id"] = user["id"]
+        session["username"] = user["username"]
+        session["profile_image"] = user["profile_image"]
+
+        # Redirigir al usuario a la página principal.
+        return redirect("/")
     else:
         return render_template("login.html")
-    # Código de la función login aquí
-    return apology("Estamos trabajando en ello")
 
 
 @auth.route("/logout")
@@ -63,8 +90,10 @@ def logout():
     Returns:
         - Una redirección a una página designada después del cierre de sesión exitoso
     """
-    # Código de la función logout aquí
-    return apology("Estamos trabajando en ello")
+    # Cerrar la sesión del usuario.
+    session.clear()
+    # Redirigir al usuario a la página de inicio.
+    return redirect("/")
 
 
 @auth.route("/register", methods=["GET", "POST"])
@@ -90,20 +119,28 @@ def register():
     if request.method == "POST":
         form_data = request.form
 
-        result = check_register_form(form_data)
+        is_valid_form, message, code = check_register_form(form_data)
         # Si hay algún problema con los datos del formulario...
-        if not result[0]:
-            return apology(result[1], result[2])
+        if not is_valid_form:
+            return apology(message, code)
 
         # Guardar la contraseña en formato hash.
         hash_password = generate_password_hash(form_data["password"])
         # Obtener la imagen del perfil.
         profile_image = get_profile_image(request.files.get('profile_image'))
+        # Agregar el usuario a la base de datos
         result_add_user = add_user(form_data["username"],
-                                   form_data["email"], hash_password, profile_image)
+                                   form_data["email"],
+                                   hash_password,
+                                   profile_image)
+        if result_add_user == 0:
+            flash('Registro exitoso. Por favor, inicia sesión.', 'success')
+            return redirect("/")
+        else:
+            return apology("No se pudo agregar el usuario.")
+
     else:
         return render_template("register.html")
-    return apology("Estamos trabajando en ello")
 
 
 def check_register_form(form_data: dict) -> tuple:

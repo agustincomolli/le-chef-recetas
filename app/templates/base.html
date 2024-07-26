@@ -16,7 +16,7 @@
   <header>
     <!-- Barra de navegación -->
     <nav class="navbar navbar-expand-lg bg-body-tertiary pb-0 border-0">
-    <!-- <nav class="navbar navbar-expand-lg navbar-light bg-light pb-0"> -->
+      <!-- <nav class="navbar navbar-expand-lg navbar-light bg-light pb-0"> -->
       <div class="container-fluid">
         <div class="d-flex align-items-center justify-content-between w-100">
           <!-- Logo y marca: Siempre a la izquierda -->
@@ -26,7 +26,7 @@
               <img class="rounded-circle" src="{{ url_for('static', filename='images/le-chef.webp') }}" alt="Logo"
                 height="64" width="64">
               <span class="ms-2 fs-3">Le Chef</span>
-              <span class="mt-5 ms-2 fs-5 align-self-end d-none d-md-inline fw-light">Recetas de cocina</span>
+              <span class="mt-5 ms-2 fs-5 align-self-end d-none d-lg-inline fw-light">Recetas de cocina</span>
             </a>
           </div>
 
@@ -42,8 +42,27 @@
           <!-- Enlaces de autenticación y menú hamburguesa: Siempre a la derecha -->
           <div class="equal-width d-flex justify-content-end align-items-center">
             {% if session["user_id"] %}
+            <div class="d-none d-sm-flex me-3 align-items-center">
+              <a href="/add_recipe" class="nav-link me-3">Agregar receta</a>
+              <a href="/my_recipes" class="nav-link">Mis recetas</a>
+              <ul class="navbar-nav ms-auto mt-2">
+                <!-- Dropdown menu -->
+                <li class="nav-item dropdown" title="User Info">
+                  <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                    aria-expanded="false">
+                    <img class="border border-warning rounded-circle bg-warning bg-opacity-25 p-2"
+                      src="{{ url_for('static', filename='images/chef-default.webp') }}" width="48" height="48"
+                      title="{{ session['username'] }}">
+                  </a>
+                  <ul class="dropdown-menu">
+                    <li class="nav-item"><a class="dropdown-item" href="/account">Mi cuenta</a></li>
+                    <li class="nav-item"><a class="dropdown-item" href="/logout">Cerrar sesión</a></li>
+                  </ul>
+                </li>
+              </ul>
+            </div>
             {% else %}
-            <div class="d-none d-sm-flex me-3">
+            <div class="d-none d-lg-flex me-3">
               <a href="/register" class="nav-link me-3">Registrarse</a>
               <a href="/login" class="nav-link">Iniciar sesión</a>
             </div>
@@ -59,6 +78,10 @@
         <!-- Menú hamburguesa desplegado: Opciones de usuario a la derecha -->
         <div class="collapse navbar-collapse" id="navbar">
           {% if session["user_id"] %}
+          <ul class="d-flex d-sm-none navbar-nav ms-auto">
+            <li class="nav-item"><a href="/add_recipe" class="nav-link">Agregar receta</a></li>
+            <li class="nav-item"><a href="/my_recipes" class="nav-link">Mis recetas</a></li>
+          </ul>
           {% else %}
           <ul class="d-flex d-sm-none navbar-nav ms-auto">
             <li class="nav-item"><a href="/register" class="nav-link">Registrarse</a></li>
@@ -69,7 +92,7 @@
       </div>
     </nav>
     <nav class="navbar bg-body-tertiary border-0 pt-0" id="categories">
-    <!-- <nav class="navbar navbar-light bg-light pt-0"> -->
+      <!-- <nav class="navbar navbar-light bg-light pt-0"> -->
       <div class="container-fluid">
         <!-- Barra de búsqueda móvil: Se muestra debajo del logo en modo responsivo -->
         <ul class="d-block d-sm-none nav justify-content-center w-100">
@@ -92,6 +115,15 @@
     </nav>
   </header>
   <main class="flex-grow-1 container py-4 text-center border shadow">
+    <!-- Sección para mensaje Flash de Python Flask -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    {% for category, message in messages %}
+    <div class="alert alert-{{ category }}">{{ message }}</div>
+    {% endfor %}
+    {% endif %}
+
+    {% endwith %}
     {% block main %}
     {% endblock %}
   </main>
