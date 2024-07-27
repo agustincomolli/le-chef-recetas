@@ -8,8 +8,7 @@
 }
 
 body {
-  background-image: url("../images/background.webp");
-  background-repeat: repeat;
+  background-color: white;
 }
 
 main {
@@ -18,6 +17,10 @@ main {
 
 form {
   max-width: 450px;
+}
+
+a:hover {
+  opacity: 0.5;
 }
 
 #categories {
@@ -40,6 +43,11 @@ form {
 
 
 @media screen and (min-width: 450px) {
+  body {
+    background-image: url("../images/background.webp");
+    background-repeat: repeat;
+  }
+
   .search-bar {
     width: 400px;
   }

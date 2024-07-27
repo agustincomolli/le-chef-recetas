@@ -43,8 +43,10 @@
           <div class="equal-width d-flex justify-content-end align-items-center">
             {% if session["user_id"] %}
             <div class="d-none d-sm-flex me-3 align-items-center">
-              <a href="/add_recipe" class="nav-link me-3">Agregar receta</a>
-              <a href="/my_recipes" class="nav-link">Mis recetas</a>
+              <ul class="navbar-nav ms-auto">
+                <li class="nav-item"><a href="/add_recipe" class="nav-link">Agregar receta</a></li>
+                <li class="nav-item"><a href="/my_recipes" class="nav-link">Mis recetas</a></li>
+              </ul>
               <ul class="navbar-nav ms-auto mt-2">
                 <!-- Dropdown menu -->
                 <li class="nav-item dropdown" title="User Info">
@@ -54,8 +56,11 @@
                       src="{{ url_for('static', filename='images/chef-default.webp') }}" width="48" height="48"
                       title="{{ session['username'] }}">
                   </a>
-                  <ul class="dropdown-menu">
+                  <ul class="dropdown-menu dropdown-menu-end">
                     <li class="nav-item"><a class="dropdown-item" href="/account">Mi cuenta</a></li>
+                    <li>
+                      <hr class="dropdown-divider">
+                    </li>
                     <li class="nav-item"><a class="dropdown-item" href="/logout">Cerrar sesión</a></li>
                   </ul>
                 </li>
@@ -76,11 +81,13 @@
         </div>
 
         <!-- Menú hamburguesa desplegado: Opciones de usuario a la derecha -->
-        <div class="collapse navbar-collapse" id="navbar">
+        <div class="collapse navbar-collapse text-end me-2 mb-3" id="navbar">
           {% if session["user_id"] %}
           <ul class="d-flex d-sm-none navbar-nav ms-auto">
             <li class="nav-item"><a href="/add_recipe" class="nav-link">Agregar receta</a></li>
             <li class="nav-item"><a href="/my_recipes" class="nav-link">Mis recetas</a></li>
+            <li class="nav-item"><a href="/account" class="nav-link">Mi cuenta</a></li>
+            <li class="nav-item"><a href="/logout" class="nav-link">Cerrar sesión</a></li>
           </ul>
           {% else %}
           <ul class="d-flex d-sm-none navbar-nav ms-auto">
@@ -114,7 +121,7 @@
       </div>
     </nav>
   </header>
-  <main class="flex-grow-1 container py-4 text-center border shadow">
+  <main class="flex-grow-1 container py-4 text-center sm-border shadow">
     <!-- Sección para mensaje Flash de Python Flask -->
     {% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}
