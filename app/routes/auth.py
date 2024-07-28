@@ -5,6 +5,7 @@ incluyendo el inicio de sesión, cierre de sesión y registro.
 """
 import tempfile
 import os
+import base64
 from flask import Blueprint, request, redirect, render_template, session, flash, current_app
 from werkzeug.security import check_password_hash, generate_password_hash
 from app.utils.helpers import apology, convert_to_webp, resize_image
@@ -15,6 +16,7 @@ from app.utils.database import add_user, get_user, is_unique_username, is_unique
 ERROR_MUST_PROVIDE_USERNAME = "Ingresa tu nombre de usuario"
 ERROR_MUST_PROVIDE_EMAIL = "Ingresa un correo electrónico válido"
 ERROR_MUST_PROVIDE_PASSWORD = "Ingresa tu contraseña"
+ERROR_INVALID_LENGTH_PASSWORD = "Su contraseña debe tener entre 8 y 20 caracteres"
 ERROR_MUST_REPEAT_PASSWORD = "Debes repetir la contraseña"
 ERROR_NOT_EQUAL_PASSWORD = "Ambas contraseñas deben ser iguales"
 ERROR_USER_EXIST = "El usuario ya existe"
@@ -71,7 +73,10 @@ def login():
         # Guardar datos del usuario.
         session["user_id"] = user["id"]
         session["username"] = user["username"]
-        session["profile_image"] = user["profile_image"]
+        image_blob = user["profile_image"]
+        # Convertir el BLOB a una cadena base64 para poder incrustarse en el html.
+        image_base64 = base64.b64encode(image_blob).decode('utf-8')
+        session["profile_image"] = image_base64
 
         # Redirigir al usuario a la página principal.
         return redirect("/")
@@ -127,7 +132,8 @@ def register():
         # Guardar la contraseña en formato hash.
         hash_password = generate_password_hash(form_data["password"])
         # Obtener la imagen del perfil.
-        profile_image = get_profile_image(request.files.get('profile_image'))
+        profile_image_file = request.files.get('input-profile-image')       
+        profile_image = get_profile_image(profile_image_file)
         # Agregar el usuario a la base de datos
         result_add_user = add_user(form_data["username"],
                                    form_data["email"],
@@ -169,6 +175,8 @@ def check_register_form(form_data: dict) -> tuple:
         return False, ERROR_MUST_PROVIDE_EMAIL, 400
     if not form_data["password"]:
         return False, ERROR_MUST_PROVIDE_PASSWORD, 400
+    if not len(form_data["password"]) >= 8 and len(form_data["password"]) <= 20:
+        return False, ERROR_INVALID_LENGTH_PASSWORD, 400
     if not form_data["confirmation"]:
         return False, ERROR_MUST_REPEAT_PASSWORD, 400
     if not form_data["password"] == form_data["confirmation"]:
@@ -218,6 +226,9 @@ def get_profile_image(profile_image) -> bytes:
             with open(temp_processed.name, 'rb') as img_file:
                 processed_image = img_file.read()
         finally:
+            # Cerrar los archivos temporales antes de eliminarlos
+            temp_original.close()
+            temp_processed.close()
             # Eliminar los archivos temporales
             os.unlink(temp_original.name)
             os.unlink(temp_processed.name)

@@ -16,7 +16,6 @@
   <header>
     <!-- Barra de navegación -->
     <nav class="navbar navbar-expand-lg bg-body-tertiary pb-0 border-0">
-      <!-- <nav class="navbar navbar-expand-lg navbar-light bg-light pb-0"> -->
       <div class="container-fluid">
         <div class="d-flex align-items-center justify-content-between w-100">
           <!-- Logo y marca: Siempre a la izquierda -->
@@ -52,8 +51,8 @@
                 <li class="nav-item dropdown" title="User Info">
                   <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
                     aria-expanded="false">
-                    <img class="border border-warning rounded-circle bg-warning bg-opacity-25 p-2"
-                      src="{{ url_for('static', filename='images/chef-default.webp') }}" width="48" height="48"
+                    <img class="border border-warning rounded-circle bg-warning bg-opacity-25 p-1"
+                      src="data:image/webp;base64,{{ session['profile_image'] }}" alt="Imagen de perfil" width="48" height="48"
                       title="{{ session['username'] }}">
                   </a>
                   <ul class="dropdown-menu dropdown-menu-end">
@@ -126,7 +125,7 @@
     {% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}
     {% for category, message in messages %}
-    <div class="alert alert-{{ category }}">{{ message }}</div>
+    <div class="alert alert-{{ category }} mx-5">{{ message }}</div>
     {% endfor %}
     {% endif %}
 

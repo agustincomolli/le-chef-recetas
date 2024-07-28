@@ -6,8 +6,12 @@ Registrarse
 
 {% block main %}
 <h2 class="mb-3 text-info">Crear una nueva cuenta</h2>
+<!-- 
+  El atributo enctype="multipart/form-data" es esencial para cualquier formulario que incluya carga de archivos, 
+  asegurando que tanto los datos de texto como los archivos binarios se envíen correctamente al servidor.
+-->
 <form action="/register" method="post" class="d-flex flex-column align-items-center mb-5 py-3 mx-auto needs-validation"
-  novalidate>
+  novalidate enctype="multipart/form-data">
   <div class="border border-warning rounded-circle bg-warning bg-opacity-25 p-2 mb-2">
     <img src="{{ url_for('static', filename='/images/chef-default.webp') }}" alt="Avatar" width="100" height="100"
       id="img-profile-image" class="rounded-circle">
