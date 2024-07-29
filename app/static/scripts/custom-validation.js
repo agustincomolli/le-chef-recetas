@@ -1,22 +1,54 @@
-// Ejemplo inicial de JavaScript para deshabilitar el envío de formularios si hay campos inválidos
+/**
+ * Script de validación mejorado para envío de formulario
+ *
+ * Este script agrega validación adicional a los formularios con la clase 'needs-validation'
+ * para asegurar que los datos ingresados sean correctos antes de enviar el formulario.
+ *
+ * La validación incluye:
+ * - Validación estándar de Bootstrap
+ * - Validación de coincidencia de contraseñas
+ */
 (() => {
-    'use strict' // Activa el modo estricto de JavaScript para una mejor calidad de código
-  
-    // Obtener todos los formularios a los que queremos aplicar estilos de validación personalizados de Bootstrap
-    const forms = document.querySelectorAll('.needs-validation')
-  
-    // Iterar sobre cada formulario y prevenir su envío si no es válido
-    Array.from(forms).forEach(form => {
-      form.addEventListener('submit', event => {
-        // Si el formulario no es válido
-        if (!form.checkValidity()) {
-          event.preventDefault() // Prevenir el envío del formulario
-          event.stopPropagation() // Detener la propagación del evento
+  'use strict';
+
+  // Selecciona todos los formularios con la clase 'needs-validation'
+  const forms = document.querySelectorAll('.needs-validation');
+
+  // Itera sobre cada formulario encontrado
+  Array.from(forms).forEach(form => {
+    // Agrega un listener para el evento 'submit' del formulario
+    form.addEventListener('submit', event => {
+      let formValid = true; // Inicializa la bandera de validación
+
+      // Realiza la validación estándar de Bootstrap
+      if (!form.checkValidity()) {
+        formValid = false; // Si la validación falla, establece la bandera en false
+      }
+
+      // Obtiene los elementos de entrada para las contraseñas
+      const password = form.querySelector('#password') || form.querySelector('#new_password');
+      const confirmation = form.querySelector('#confirmation');
+
+      // Valida la coincidencia de contraseñas
+      if (password && confirmation) {
+        if (password.value !== confirmation.value) {
+          // Si las contraseñas no coinciden, establece un mensaje de error personalizado
+          confirmation.setCustomValidity('Las contraseñas no coinciden');
+          formValid = false;
+        } else {
+          // Si las contraseñas coinciden, borra el mensaje de error
+          confirmation.setCustomValidity('');
         }
-  
-        // Agregar la clase 'was-validated' al formulario para activar los estilos de validación de Bootstrap
-        form.classList.add('was-validated')
-      }, false) // false para indicar que el evento no se debe capturar en la fase de captura
-    })
-  })() // La función se invoca inmediatamente después de su declaración
-  
+      }
+
+      // Si la validación falló, previene el envío del formulario y muestra los mensajes de error
+      if (!formValid) {
+        event.preventDefault();
+        event.stopPropagation();
+      }
+
+      // Agrega la clase 'was-validated' al formulario para mostrar los mensajes de error
+      form.classList.add('was-validated');
+    }, false);
+  });
+})();

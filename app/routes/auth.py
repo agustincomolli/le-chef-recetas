@@ -8,7 +8,7 @@ import os
 import base64
 from flask import Blueprint, request, redirect, render_template, session, flash, current_app
 from werkzeug.security import check_password_hash, generate_password_hash
-from app.utils.helpers import apology, convert_to_webp, resize_image
+from app.utils.helpers import apology, convert_to_webp, resize_image, login_required
 from app.utils.database import add_user, get_user, is_unique_username, is_unique_email
 
 
@@ -26,6 +26,17 @@ ERROR_EMAIL_EXIST = "El correo electrónico ya existe"
 ERROR_ADD_USER = 1
 
 auth = Blueprint('auth', __name__)
+
+
+@auth.route("/account")
+@login_required
+def account():
+    user = get_user(session["username"])
+    user["profile_image"] = session["profile_image"]
+    if request.method == "POST":
+        pass
+    else:
+        return render_template("account.html", user=user)
 
 
 @auth.route("/login", methods=["GET", "POST"])
@@ -60,7 +71,6 @@ def login():
             return apology(ERROR_MUST_PROVIDE_PASSWORD, 403)
 
         user = get_user(username)
-        print(user)
         # Comprobar si el usuario es correcto.
         if not user:
             flash(ERROR_USER_NOT_EXIST, "warning")
@@ -132,7 +142,7 @@ def register():
         # Guardar la contraseña en formato hash.
         hash_password = generate_password_hash(form_data["password"])
         # Obtener la imagen del perfil.
-        profile_image_file = request.files.get('input-profile-image')       
+        profile_image_file = request.files.get('input-profile-image')
         profile_image = get_profile_image(profile_image_file)
         # Agregar el usuario a la base de datos
         result_add_user = add_user(form_data["username"],
