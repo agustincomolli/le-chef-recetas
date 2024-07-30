@@ -2,12 +2,13 @@
 Inicialización de la aplicación Flask.
 
 """
-from flask import Flask
+from flask import Flask, render_template
 from flask_session import Session
 from .config import Config
 from .extensions import db
 from .routes.main import main
 from .routes.auth import auth
+from .utils.helpers import apology
 
 
 def create_app():
@@ -62,6 +63,21 @@ def create_app():
         response.headers["Expires"] = 0
         response.headers["Pragma"] = "no-cache"
         return response
+
+    @app.errorhandler(404)
+    def page_not_found(error):  # pylint: disable=unused-argument
+        """
+        Manejador de errores para el código de estado HTTP 404 (No encontrado).
+
+        Args:
+            error (HTTPException): El objeto de excepción que contiene detalles sobre el error.
+
+        Returns:
+            Response: Una respuesta personalizada que incluye un mensaje de error y el 
+                      código de estado 404.
+        """
+        # return apology("página no encontrada", 404)
+        return render_template("error-404.html")
 
     return app
 

@@ -3,6 +3,7 @@ Este módulo contiene las funciones que tocarán la base de datos.
 """
 
 from sqlalchemy import text
+from sqlalchemy.exc import SQLAlchemyError
 from app import db
 
 
@@ -31,7 +32,7 @@ def get_categories() -> list[str]:
     """
     Obtiene una lista de nombres de categorías desde la base de datos.
 
-    Esta función ejecuta una consulta SQL para seleccionar todos los nombres de 
+    Esta función ejecuta una consulta SQL para seleccionar todos los nombres de
     las categorías de la tabla 'categories', y retorna una lista con estos nombres.
 
     Returns:
@@ -46,7 +47,7 @@ def is_unique_username(username: str) -> bool:
     """
     Verifica si un nombre de usuario es único en la base de datos.
 
-    Esta función consulta la tabla 'users' para determinar si el nombre de usuario 
+    Esta función consulta la tabla 'users' para determinar si el nombre de usuario
     proporcionado ya existe. Si existe, retorna False; de lo contrario, retorna True.
 
     Args:
@@ -69,7 +70,7 @@ def is_unique_email(email: str) -> bool:
     """
     Verifica si un correo electrónico es único en la base de datos.
 
-    Esta función consulta la tabla 'users' para determinar si el email 
+    Esta función consulta la tabla 'users' para determinar si el email
     proporcionado ya existe. Si existe, retorna False; de lo contrario, retorna True.
 
     Args:
@@ -92,8 +93,8 @@ def add_user(username: str, email: str, password: str, profile_image: bytes) -> 
     """
     Agrega un nuevo usuario a la base de datos.
 
-    Esta función inserta un nuevo registro en la tabla 'users' con el nombre de usuario, 
-    correo electrónico, contraseña y la imagen de perfil proporcionados. Si la operación 
+    Esta función inserta un nuevo registro en la tabla 'users' con el nombre de usuario,
+    correo electrónico, contraseña y la imagen de perfil proporcionados. Si la operación
     es exitosa, retorna 0. En caso de error, retorna 1.
 
     Args:
@@ -122,6 +123,35 @@ def add_user(username: str, email: str, password: str, profile_image: bytes) -> 
             return 0
     except Exception as e:
         print(f"Error al agregar usuario: {e}")
+        return 1
+
+
+def delete_user(user_id: int) -> int:
+    """
+    Elimina un usuario de la base de datos según su ID.
+
+    Args:
+        user_id (int): El ID del usuario a eliminar.
+
+    Returns:
+        int: 0 si el usuario se eliminó correctamente, 1 si ocurrió un error.
+    """
+
+    # pylint: disable=broad-exception-caught
+
+    try:
+        # Iniciar una transacción.
+        with db.session.begin():
+            sql = "DELETE FROM users WHERE id = :user_id;"
+            db.session.execute(text(sql), {"user_id": user_id})
+            return 0
+    except SQLAlchemyError as e:
+        # Manejar errores específicos de SQLAlchemy
+        print(f"Error de base de datos al eliminar usuario: {e}")
+        return 1
+    except Exception as e:
+        # Manejar cualquier otro error no esperado
+        print(f"Error inesperado al eliminar usuario: {e}")
         return 1
 
 

@@ -9,7 +9,7 @@ import base64
 from flask import Blueprint, request, redirect, render_template, session, flash, current_app
 from werkzeug.security import check_password_hash, generate_password_hash
 from app.utils.helpers import apology, convert_to_webp, resize_image, login_required
-from app.utils.database import add_user, get_user, is_unique_username, is_unique_email
+from app.utils.database import add_user, get_user, is_unique_username, is_unique_email, delete_user
 
 
 # Error codes.
@@ -23,12 +23,13 @@ ERROR_USER_EXIST = "El usuario ya existe"
 ERROR_USER_NOT_EXIST = "El usuario no existe"
 ERROR_INCORRECT_PASSWORD = "La contraseña es incorrecta"
 ERROR_EMAIL_EXIST = "El correo electrónico ya existe"
-ERROR_ADD_USER = 1
+ERROR_IMAGE_TOO_BIG = "El archivo debe ser menor de 1MB"
+ERROR_DB_OPERATION = 1
 
 auth = Blueprint('auth', __name__)
 
 
-@auth.route("/account")
+@auth.route("/account", methods=["GET", "POST"])
 @login_required
 def account():
     user = get_user(session["username"])
@@ -37,6 +38,30 @@ def account():
         pass
     else:
         return render_template("account.html", user=user)
+
+
+@auth.route("/delete_account", methods=["POST"])
+@login_required
+def delete_account():
+    """
+    Elimina la cuenta del usuario actual y limpia la sesión.
+
+    Returns:
+        redirect: Redirige a la página de inicio si la eliminación es exitosa.
+                  Redirige a la página de cuenta si ocurre un error.
+    """
+
+    user_id = session["user_id"]
+    result = delete_user(user_id)
+    if not result == ERROR_DB_OPERATION:
+        # Eliminar la sesión.
+        session.clear()
+        # Informar al usuario.
+        flash('Tu cuenta ha sido eliminada exitosamente.', 'success')
+        return redirect("/")
+    else:
+        flash('No se pudo eliminar la cuenta. Por favor, inténtalo de nuevo.', 'danger')
+        return redirect("/account")
 
 
 @auth.route("/login", methods=["GET", "POST"])
@@ -149,7 +174,7 @@ def register():
                                    form_data["email"],
                                    hash_password,
                                    profile_image)
-        if result_add_user == 0:
+        if not result_add_user == ERROR_DB_OPERATION:
             flash('Registro exitoso. Por favor, inicia sesión.', 'success')
             return redirect("/")
         else:
@@ -179,6 +204,10 @@ def check_register_form(form_data: dict) -> tuple:
     Raises:
         KeyError: Si alguna de las claves esperadas no está presente en form_data.
     """
+    image_file = request.files['input-profile-image']
+    if image_file and allowed_file(image_file.filename):
+        if image_file.content_length > 1048576:  # 1MB en bytes
+            return False, ERROR_IMAGE_TOO_BIG, 400
     if not form_data["username"]:
         return False, ERROR_MUST_PROVIDE_USERNAME, 400
     if not form_data["email"]:
@@ -244,3 +273,21 @@ def get_profile_image(profile_image) -> bytes:
             os.unlink(temp_processed.name)
 
     return processed_image
+
+
+def allowed_file(filename: str) -> bool:
+    """
+    Verifica si el nombre de archivo tiene una extensión permitida.
+
+    Args:
+        filename (str): El nombre del archivo a verificar.
+
+    Returns:
+        bool: True si el archivo tiene una extensión permitida, False en caso contrario.
+    """
+    # Verificar si el nombre de archivo contiene un punto (.)
+    if '.' in filename:
+        # Separar el nombre de archivo por el punto y verificar la extensión
+        extension = filename.rsplit('.', 1)[1].lower()
+        return extension in {'png', 'jpg', 'jpeg', 'gif', 'webp'}
+    return False

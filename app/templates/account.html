@@ -19,15 +19,18 @@ Actualizar cuenta
   </div>
   <div class="form-group mb-3 d-flex flex-column align-items-start">
     <label for="input-profile-image" class="form-label">Imagen de perfil:</label>
-    <input type="file" name="input-profile-image" id="input-profile-image" class="form-control register-input"
+    <input type="file" name="input-profile-image" id="input-profile-image" class="form-control account-input"
       accept="image/, .png, .jpg, .jpeg, .gif, .webp" aria-describedby="profile-image-help-block">
     <div id="profile-image-help-block" class="form-text">
       Selecciona el archivo que tendrá la imagen de tu perfil.
     </div>
-  </div>
+    <div class="invalid-feedback text-start">
+      El archivo debe ser menor de 1MB.
+    </div>
+</div>
   <div class="form-group mb-3 d-flex flex-column align-items-start">
     <label for="username" class="form-label">Usuario:</label>
-    <input type="text" name="username" id="username" class="form-control register-input" autocomplete="off" autofocus
+    <input type="text" name="username" id="username" class="form-control account-input" autocomplete="off" autofocus
       required value="{{ user['username'] }}">
     <div class="invalid-feedback text-start">
       Por favor, elija un nombre de usuario.
@@ -35,7 +38,7 @@ Actualizar cuenta
   </div>
   <div class="form-group mb-3 d-flex flex-column align-items-start">
     <label for="email" class="form-label">Correo electrónico:</label>
-    <input type="email" name="email" id="email" class="form-control register-input" autocomplete="off"
+    <input type="email" name="email" id="email" class="form-control account-input" autocomplete="off"
       placeholder="alguien@dominio.com" required value="{{ user['email'] }}">
     <div class="invalid-feedback text-start">
       Por favor proporcione un correo electrónico válido.
@@ -43,14 +46,14 @@ Actualizar cuenta
   </div>
   <div class="form-group mb-3 d-flex flex-column align-items-start">
     <label for="current_password" class="form-label">Contraseña actual:</label>
-    <input type="password" name="current_password" id="current_password" class="form-control register-input" required>
+    <input type="password" name="current_password" id="current_password" class="form-control account-input" required>
     <div class="invalid-feedback text-start">
       Por favor, ingrese su contraseña actual.
     </div>
   </div>
   <div class="form-group mb-3 d-flex flex-column align-items-start">
     <label for="new_password" class="form-label">Nueva contraseña (opcional):</label>
-    <input type="password" name="new_password" id="new_password" class="form-control register-input"
+    <input type="password" name="new_password" id="new_password" class="form-control account-input"
       aria-describedby="password-help-block" minlength="8" maxlength="20">
     <div id="password-help-block" class="form-text text-start">
       Su nueva contraseña debe tener entre 8 y 20 caracteres. <br>
@@ -62,7 +65,7 @@ Actualizar cuenta
   </div>
   <div class="form-group mb-3 d-flex flex-column align-items-start">
     <label for="confirmation" class="form-label">Repetir contraseña:</label>
-    <input type="password" name="confirmation" id="confirmation" class="form-control register-input" minlength="8"
+    <input type="password" name="confirmation" id="confirmation" class="form-control account-input" minlength="8"
       maxlength="20" required>
     <div class="invalid-feedback text-start">
       Ambas contraseñas deben ser iguales.
@@ -105,6 +108,6 @@ Actualizar cuenta
   </div>
 </div>
 
-<script src="{{ url_for('static', filename='/scripts/custom-validation.js') }}"></script>
+<script src="{{ url_for('static', filename='/scripts/account-validation.js') }}"></script>
 <script src="{{ url_for('static', filename='/scripts/profile-image-loader.js') }}"></script>
 {% endblock %}

@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block title %}
+Página no encontrada
+{% endblock %}
+
+{% block main %}
+<header style="height: 10px;">
+  <h2 class="position-relative title-404">¡Oops!</h2>
+</header>
+<section>
+  <img class="img-fluid px-3" src="{{ url_for('static', filename='/images/404.webp') }}" alt="Página no encontrada">
+</section>
+<footer>
+  <h3 class="fs-2">
+    Parece que estás perdido
+  </h3>
+  <p>¡La página que estás buscando no está disponible!</p>
+  <p><a class="btn btn-primary" href="/" role="button">Volver a la página de inicio</a></p>
+</footer>
+{% endblock %}

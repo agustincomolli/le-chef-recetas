@@ -41,6 +41,18 @@
         }
       }
 
+      // Valida el tamaño del archivo de imagen
+      const imageInput = form.querySelector('#input-profile-image');
+      if (imageInput && imageInput.files.length > 0) {
+        const file = imageInput.files[0];
+        if (file.size > 1048576) { // 1MB en bytes
+          formValid = false;
+          imageInput.setCustomValidity('El archivo debe ser menor de 1MB');
+        } else {
+          imageInput.setCustomValidity('');
+        }
+      }
+
       // Si la validación falló, previene el envío del formulario y muestra los mensajes de error
       if (!formValid) {
         event.preventDefault();

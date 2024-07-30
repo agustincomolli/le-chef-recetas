@@ -1,5 +1,6 @@
+@import url("./partials/account.css");
+@import url("./partials/error-404.css");
 @import url("./partials/login.css");
-@import url("./partials/register.css");
 
 @font-face {
   font-family: "Pacifico";
