@@ -29,14 +29,15 @@
       const password = form.querySelector('#password') || form.querySelector('#new_password');
       const confirmation = form.querySelector('#confirmation');
 
-      // Valida la coincidencia de contraseñas
+      // Valida la coincidencia de contraseñas solo si el campo de nueva contraseña no está vacío
       if (password && confirmation) {
-        if (password.value !== confirmation.value) {
+        console.log(password.value);
+        if (password.value.length !== '' && password.value !== confirmation.value) {
           // Si las contraseñas no coinciden, establece un mensaje de error personalizado
           confirmation.setCustomValidity('Las contraseñas no coinciden');
           formValid = false;
         } else {
-          // Si las contraseñas coinciden, borra el mensaje de error
+          // Si las contraseñas coinciden o el campo de nueva contraseña está vacío, borra el mensaje de error
           confirmation.setCustomValidity('');
         }
       }

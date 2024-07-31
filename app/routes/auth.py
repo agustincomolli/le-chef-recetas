@@ -9,10 +9,11 @@ import base64
 from flask import Blueprint, request, redirect, render_template, session, flash, current_app
 from werkzeug.security import check_password_hash, generate_password_hash
 from app.utils.helpers import apology, convert_to_webp, resize_image, login_required
-from app.utils.database import add_user, get_user, is_unique_username, is_unique_email, delete_user
+from app.utils.database import is_unique_username, is_unique_email
+from app.utils.database import add_user, get_user, delete_user, update_user
 
 
-# Error codes.
+# Códigos de error.
 ERROR_MUST_PROVIDE_USERNAME = "Ingresa tu nombre de usuario"
 ERROR_MUST_PROVIDE_EMAIL = "Ingresa un correo electrónico válido"
 ERROR_MUST_PROVIDE_PASSWORD = "Ingresa tu contraseña"
@@ -32,12 +33,60 @@ auth = Blueprint('auth', __name__)
 @auth.route("/account", methods=["GET", "POST"])
 @login_required
 def account():
+    """
+    Renderiza la página de la cuenta de usuario y maneja la actualización de los datos de la cuenta.
+
+    Si el método de la solicitud es POST, procesa el formulario de actualización de la cuenta.
+    Verifica la validez de los datos del formulario, comprueba la contraseña actual, actualiza
+    la imagen de perfil y la información del usuario en la base de datos. Redirige a la página
+    principal con un mensaje flash que indica el resultado de la operación.
+
+    Si el método de la solicitud es GET, renderiza la plantilla de la cuenta con la información
+    del usuario actual.
+
+    Returns:
+        Response: La respuesta de la solicitud, que será la plantilla "account.html" para GET 
+                  o una redirección con un mensaje flash para POST.
+    """
     user = get_user(session["username"])
     user["profile_image"] = session["profile_image"]
+
     if request.method == "POST":
-        pass
-    else:
-        return render_template("account.html", user=user)
+        form_data = request.form
+
+        is_valid_form, message, code = check_register_form(
+            form_data, update=True)
+        # Si hay algún problema con los datos del formulario...
+        if not is_valid_form:
+            return apology(message, code)
+
+        # Comprobar si la contraseña actual es correcta.
+        if not check_password_hash(user["password"], form_data["current_password"]):
+            flash("La contraseña actual es incorrecta", "error")
+            return redirect("/account")
+
+        # Obtener la imagen del perfil.
+        profile_image_file = request.files.get('input-profile-image')
+        profile_image = get_profile_image(profile_image_file)
+
+        if not form_data["new_password"]:
+            password = generate_password_hash(form_data["current_password"])
+        else:
+            password = generate_password_hash(form_data["new_password"])
+        
+        # Actualiza los datos del usuario en la base de datos
+        result_update_user = update_user(session["user_id"],
+                                         form_data["username"],
+                                         form_data["email"],
+                                         password,
+                                         profile_image)
+        if not result_update_user == ERROR_DB_OPERATION:
+            flash('Su información ha sido actualizada con exito.', 'success')
+            return redirect("/logout")
+
+        return apology("No se pudo modificar el usuario.", 500)
+
+    return render_template("account.html", user=user)
 
 
 @auth.route("/delete_account", methods=["POST"])
@@ -59,9 +108,9 @@ def delete_account():
         # Informar al usuario.
         flash('Tu cuenta ha sido eliminada exitosamente.', 'success')
         return redirect("/")
-    else:
-        flash('No se pudo eliminar la cuenta. Por favor, inténtalo de nuevo.', 'danger')
-        return redirect("/account")
+
+    flash('No se pudo eliminar la cuenta. Por favor, inténtalo de nuevo.', 'danger')
+    return redirect("/account")
 
 
 @auth.route("/login", methods=["GET", "POST"])
@@ -115,8 +164,8 @@ def login():
 
         # Redirigir al usuario a la página principal.
         return redirect("/")
-    else:
-        return render_template("login.html")
+
+    return render_template("login.html")
 
 
 @auth.route("/logout")
@@ -178,15 +227,15 @@ def register():
             flash('Registro exitoso. Por favor, inicia sesión.', 'success')
             return redirect("/")
         else:
-            return apology("No se pudo agregar el usuario.")
+            return apology("No se pudo agregar el usuario.", 500)
 
     else:
         return render_template("register.html")
 
 
-def check_register_form(form_data: dict) -> tuple:
+def check_register_form(form_data: dict, update=False) -> tuple:
     """
-    Valida los datos del formulario de registro de usuario.
+    Valida los datos del formulario de registro de usuario o actualización de cuenta.
 
     Esta función verifica los datos del formulario para asegurar que todos los campos 
     requeridos estén presentes y que cumplan con las condiciones necesarias. Retorna 
@@ -196,6 +245,7 @@ def check_register_form(form_data: dict) -> tuple:
     Args:
         form_data (dict): Un diccionario que contiene los datos del formulario. 
             Debe incluir las claves 'username', 'email', 'password', y 'confirmation'.
+        update (bool): Indica si se trata de una actualización de cuenta.
 
     Returns:
         tuple: Una tupla que contiene un booleano indicando si los datos son válidos, 
@@ -204,26 +254,38 @@ def check_register_form(form_data: dict) -> tuple:
     Raises:
         KeyError: Si alguna de las claves esperadas no está presente en form_data.
     """
-    image_file = request.files['input-profile-image']
+    image_file = request.files.get('input-profile-image')
     if image_file and allowed_file(image_file.filename):
         if image_file.content_length > 1048576:  # 1MB en bytes
             return False, ERROR_IMAGE_TOO_BIG, 400
+
     if not form_data["username"]:
         return False, ERROR_MUST_PROVIDE_USERNAME, 400
     if not form_data["email"]:
         return False, ERROR_MUST_PROVIDE_EMAIL, 400
-    if not form_data["password"]:
-        return False, ERROR_MUST_PROVIDE_PASSWORD, 400
-    if not len(form_data["password"]) >= 8 and len(form_data["password"]) <= 20:
-        return False, ERROR_INVALID_LENGTH_PASSWORD, 400
-    if not form_data["confirmation"]:
-        return False, ERROR_MUST_REPEAT_PASSWORD, 400
-    if not form_data["password"] == form_data["confirmation"]:
-        return False, ERROR_NOT_EQUAL_PASSWORD, 400
-    if not is_unique_username(form_data["username"]):
-        return False, ERROR_USER_EXIST, 400
-    if not is_unique_email(form_data["email"]):
-        return False, ERROR_EMAIL_EXIST, 400
+
+    if update:
+        # Validaciones específicas para la actualización de cuenta
+        if not form_data["current_password"]:
+            return False, ERROR_MUST_PROVIDE_PASSWORD, 400
+        if form_data.get("new_password"):
+            if not 8 <= len(form_data["new_password"]) <= 20:
+                return False, ERROR_INVALID_LENGTH_PASSWORD, 400
+            if not form_data["new_password"] == form_data["confirmation"]:
+                return False, ERROR_NOT_EQUAL_PASSWORD, 400
+    else:
+        # Validaciones específicas para el registro
+        if not form_data["password"]:
+            return False, ERROR_MUST_PROVIDE_PASSWORD, 400
+        if not 8 <= len(form_data["password"]) <= 20:
+            return False, ERROR_INVALID_LENGTH_PASSWORD, 400
+        if not form_data["password"] == form_data["confirmation"]:
+            return False, ERROR_NOT_EQUAL_PASSWORD, 400
+
+        if not is_unique_username(form_data["username"]):
+            return False, ERROR_USER_EXIST, 400
+        if not is_unique_email(form_data["email"]):
+            return False, ERROR_EMAIL_EXIST, 400
 
     return True, "OK", 200
 

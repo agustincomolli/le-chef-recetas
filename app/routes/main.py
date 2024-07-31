@@ -41,8 +41,8 @@ def contact():
             else:
                 flash("Lo lamentamos, no pudimos enviar tu mensaje.", "error")
         except requests.RequestException:
-            flash(
-                "Error al intentar enviar el mensaje. Por favor, inténtalo de nuevo más tarde.", "error")
+            flash("Error al intentar enviar el mensaje. Por favor, inténtalo de nuevo más tarde.",
+                  "error")
 
         # Redirigir a la página principal después del envío.
         return redirect("/")

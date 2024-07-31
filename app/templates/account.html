@@ -10,7 +10,7 @@ Actualizar cuenta
   El atributo enctype="multipart/form-data" es esencial para cualquier formulario que incluya carga de archivos, 
   asegurando que tanto los datos de texto como los archivos binarios se envíen correctamente al servidor.
 -->
-<form action="/update_profile" method="post"
+<form action="/account" method="post"
   class="d-flex flex-column align-items-center mb-5 py-3 mx-auto needs-validation" novalidate
   enctype="multipart/form-data">
   <div class="border border-warning rounded-circle bg-warning bg-opacity-25 p-2 mb-2">
@@ -66,7 +66,7 @@ Actualizar cuenta
   <div class="form-group mb-3 d-flex flex-column align-items-start">
     <label for="confirmation" class="form-label">Repetir contraseña:</label>
     <input type="password" name="confirmation" id="confirmation" class="form-control account-input" minlength="8"
-      maxlength="20" required>
+      maxlength="20">
     <div class="invalid-feedback text-start">
       Ambas contraseñas deben ser iguales.
     </div>

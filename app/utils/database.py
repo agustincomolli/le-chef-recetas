@@ -194,3 +194,48 @@ def get_user(username: str) -> dict:
         # Manejar cualquier otro error no esperado
         print(f"Error inesperado al obtener usuario: {e}")
         return None
+
+
+def update_user(user_id: int, username: str, email: str, password: str,
+                profile_image: bytes) -> int:
+    """
+    Modifica los datos usuario en la base de datos.
+
+    Esta función modifica un registro en la tabla 'users' con el nombre de usuario,
+    correo electrónico, contraseña y la imagen de perfil proporcionados. Si la operación
+    es exitosa, retorna 0. En caso de error, retorna 1.
+
+    Args:
+        user_id (int): El id del usuario.
+        username (str): El nombre de usuario.
+        email (str): El correo electrónico del usuario.
+        password (str): La contraseña del usuario.
+        profile_image (bytes): La imagen de perfil del usuario en formato binario.
+
+    Returns:
+        int: 0 si la operación es exitosa, 1 en caso de error.
+    """
+
+    # pylint: disable=broad-exception-caught
+
+    try:
+        # Iniciar una transacción.
+        with db.engine.begin() as connection:
+            sql = "UPDATE users SET"
+            sql += " username = :username,"
+            sql += " email = :email,"
+            sql += " password = :password,"
+            sql += " profile_image = :profile_image"
+            sql += " WHERE id = :user_id;"
+            values = {"username": username,
+                      "email": email,
+                      "password": password,
+                      "profile_image": profile_image,
+                      "user_id": user_id
+                      }
+            print(sql)
+            connection.execute(text(sql), values)
+            return 0
+    except Exception as e:
+        print(f"Error al modificar el usuario: {e}")
+        return 1
