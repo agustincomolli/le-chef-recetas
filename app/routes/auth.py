@@ -54,26 +54,29 @@ def account():
     if request.method == "POST":
         form_data = request.form
 
-        is_valid_form, message, code = check_register_form(
-            form_data, update=True)
+        is_valid_form, message, code = validate_profile_data(form_data,
+                                                             update=True)
         # Si hay algún problema con los datos del formulario...
         if not is_valid_form:
             return apology(message, code)
 
         # Comprobar si la contraseña actual es correcta.
         if not check_password_hash(user["password"], form_data["current_password"]):
-            flash("La contraseña actual es incorrecta", "error")
+            flash("La contraseña actual es incorrecta", "danger")
             return redirect("/account")
 
         # Obtener la imagen del perfil.
         profile_image_file = request.files.get('input-profile-image')
-        profile_image = get_profile_image(profile_image_file)
+        if profile_image_file:
+            profile_image = get_profile_image(profile_image_file)
+        else:
+            profile_image = get_user(session["username"])["profile_image"]
 
         if not form_data["new_password"]:
             password = generate_password_hash(form_data["current_password"])
         else:
             password = generate_password_hash(form_data["new_password"])
-        
+
         # Actualiza los datos del usuario en la base de datos
         result_update_user = update_user(session["user_id"],
                                          form_data["username"],
@@ -82,7 +85,7 @@ def account():
                                          profile_image)
         if not result_update_user == ERROR_DB_OPERATION:
             flash('Su información ha sido actualizada con exito.', 'success')
-            return redirect("/logout")
+            return redirect("/login")
 
         return apology("No se pudo modificar el usuario.", 500)
 
@@ -208,7 +211,7 @@ def register():
     if request.method == "POST":
         form_data = request.form
 
-        is_valid_form, message, code = check_register_form(form_data)
+        is_valid_form, message, code = validate_profile_data(form_data)
         # Si hay algún problema con los datos del formulario...
         if not is_valid_form:
             return apology(message, code)
@@ -225,7 +228,7 @@ def register():
                                    profile_image)
         if not result_add_user == ERROR_DB_OPERATION:
             flash('Registro exitoso. Por favor, inicia sesión.', 'success')
-            return redirect("/")
+            return redirect("/login")
         else:
             return apology("No se pudo agregar el usuario.", 500)
 
@@ -233,61 +236,144 @@ def register():
         return render_template("register.html")
 
 
-def check_register_form(form_data: dict, update=False) -> tuple:
+def validate_profile_data(form_data: dict, update=False) -> tuple:
     """
-    Valida los datos del formulario de registro de usuario o actualización de cuenta.
-
-    Esta función verifica los datos del formulario para asegurar que todos los campos 
-    requeridos estén presentes y que cumplan con las condiciones necesarias. Retorna 
-    una tupla que indica si los datos son válidos, un mensaje de error o éxito, y un 
-    código de estado HTTP.
+    Valida los datos del formulario de registro o actualización de usuario.
 
     Args:
-        form_data (dict): Un diccionario que contiene los datos del formulario. 
-            Debe incluir las claves 'username', 'email', 'password', y 'confirmation'.
-        update (bool): Indica si se trata de una actualización de cuenta.
+        form_data (dict): Los datos del formulario enviados por el usuario.
+        update (bool): Indica si se trata de una actualización de usuario. 
+                       Por defecto es False.
 
     Returns:
-        tuple: Una tupla que contiene un booleano indicando si los datos son válidos, 
-        un mensaje de error o éxito, y un código de estado HTTP.
-
-    Raises:
-        KeyError: Si alguna de las claves esperadas no está presente en form_data.
+        tuple: Una tupla que contiene:
+            - bool: True si todas las validaciones pasan, False si alguna falla.
+            - str: Mensaje de error si alguna validación falla, "OK" si todas pasan.
+            - int: Código de estado HTTP, 200 si todas las validaciones pasan, otro código 
+                   si alguna falla.
     """
+    validations = []
+
+    # Validar la imagen de perfil
     image_file = request.files.get('input-profile-image')
+    validations.append(validate_profile_image(image_file))
+
+    # Validar el nombre de usuario
+    validations.append(validate_username(form_data["username"], update))
+
+    # Validar el correo electrónico
+    validations.append(validate_email(form_data["email"], update))
+
+    # Validaciones específicas para actualización
+    if update:
+        password = form_data["current_password"]
+        new_password = form_data["new_password"]
+
+        # Validar las contraseñas
+        validations.append(validate_passwords(password, "", True))
+        if new_password:
+            confirmation = form_data["confirmation"]
+            validations.append(validate_passwords(new_password, confirmation))
+
+    # Validaciones específicas para registro
+    else:
+        password = form_data["password"]
+        confirmation = form_data["confirmation"]
+
+        # Validar las contraseñas
+        validations.append(validate_passwords(password, confirmation))
+
+    # Comprobar cada validación
+    for validation in validations:
+        is_valid, message, code = validation
+        if not is_valid:
+            return is_valid, message, code
+
+    return True, "OK", 200
+
+
+def validate_profile_image(image_file) -> tuple:
+    """
+    Valida la imagen de perfil.
+
+    Args:
+        image_file: El archivo de imagen subido.
+
+    Returns:
+        tuple: (bool, str, int) - Indica si la imagen es válida, el mensaje de error y el 
+                código de estado HTTP.
+    """
     if image_file and allowed_file(image_file.filename):
         if image_file.content_length > 1048576:  # 1MB en bytes
             return False, ERROR_IMAGE_TOO_BIG, 400
+    return True, "", 200
 
-    if not form_data["username"]:
+
+def validate_username(username: str, update: bool) -> tuple:
+    """
+    Valida el nombre de usuario.
+
+    Args:
+        username (str): El nombre de usuario.
+        update (bool): Indica si se trata de una actualización de cuenta.
+
+    Returns:
+        tuple: (bool, str, int) - Indica si el nombre de usuario es válido, el mensaje de 
+               error y el código de estado HTTP.
+    """
+    if not username:
         return False, ERROR_MUST_PROVIDE_USERNAME, 400
-    if not form_data["email"]:
+    if not update and not is_unique_username(username):
+        return False, ERROR_USER_EXIST, 400
+    return True, "", 200
+
+
+def validate_email(email: str, update: bool) -> tuple:
+    """
+    Valida el correo electrónico.
+
+    Args:
+        email (str): El correo electrónico.
+        update (bool): Indica si se trata de una actualización de cuenta.
+
+    Returns:
+        tuple: (bool, str, int) - Indica si el correo electrónico es válido, el mensaje de 
+               error y el código de estado HTTP.
+    """
+    if not email:
         return False, ERROR_MUST_PROVIDE_EMAIL, 400
+    if not update and not is_unique_email(email):
+        return False, ERROR_EMAIL_EXIST, 400
+    return True, "", 200
 
-    if update:
-        # Validaciones específicas para la actualización de cuenta
-        if not form_data["current_password"]:
-            return False, ERROR_MUST_PROVIDE_PASSWORD, 400
-        if form_data.get("new_password"):
-            if not 8 <= len(form_data["new_password"]) <= 20:
-                return False, ERROR_INVALID_LENGTH_PASSWORD, 400
-            if not form_data["new_password"] == form_data["confirmation"]:
-                return False, ERROR_NOT_EQUAL_PASSWORD, 400
-    else:
-        # Validaciones específicas para el registro
-        if not form_data["password"]:
-            return False, ERROR_MUST_PROVIDE_PASSWORD, 400
-        if not 8 <= len(form_data["password"]) <= 20:
-            return False, ERROR_INVALID_LENGTH_PASSWORD, 400
-        if not form_data["password"] == form_data["confirmation"]:
-            return False, ERROR_NOT_EQUAL_PASSWORD, 400
 
-        if not is_unique_username(form_data["username"]):
-            return False, ERROR_USER_EXIST, 400
-        if not is_unique_email(form_data["email"]):
-            return False, ERROR_EMAIL_EXIST, 400
+def validate_passwords(password: str, confirmation: str, skip_confirmation: bool = False) -> tuple:
+    """
+    Valida las contraseñas proporcionadas y su confirmación.
 
-    return True, "OK", 200
+    Args:
+        password (str): La contraseña proporcionada.
+        confirmation (str): La confirmación de la contraseña.
+        skip_confirmation (bool): Indica si se debe omitir la confirmación de la contraseña. 
+                                  Por defecto es False.
+
+    Returns:
+        tuple: Una tupla que contiene:
+            - bool: True si la validación pasa, False si falla.
+            - str: Mensaje de error si la validación falla, vacío si pasa.
+            - int: Código de estado HTTP, 200 si la validación pasa, otro código si falla.
+    """
+
+    if not password:
+        return False, ERROR_MUST_PROVIDE_PASSWORD, 400
+
+    if password and (not 8 <= len(password) <= 20):
+        return False, ERROR_INVALID_LENGTH_PASSWORD, 400
+
+    if password and password != confirmation and not skip_confirmation:
+        return False, ERROR_NOT_EQUAL_PASSWORD, 400
+
+    return True, "", 200
 
 
 def get_profile_image(profile_image) -> bytes:

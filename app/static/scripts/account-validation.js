@@ -31,7 +31,6 @@
 
       // Valida la coincidencia de contraseñas solo si el campo de nueva contraseña no está vacío
       if (password && confirmation) {
-        console.log(password.value);
         if (password.value.length !== '' && password.value !== confirmation.value) {
           // Si las contraseñas no coinciden, establece un mensaje de error personalizado
           confirmation.setCustomValidity('Las contraseñas no coinciden');
