@@ -12,7 +12,13 @@ Registrarse
 -->
 <form action="/register" method="post" class="d-flex flex-column align-items-center mb-5 py-3 mx-auto needs-validation"
   novalidate enctype="multipart/form-data">
-  <div class="border border-warning rounded-circle bg-warning bg-opacity-25 p-2 mb-2">
+    <!-- 
+      Campo oculto que contiene un token CSRF. Este token se compara con el token almacenado 
+      en el servidor para verificar la autenticidad de la solicitud y evitar ataques de 
+      falsificación de solicitudes entre sitios Cross-Site Request Forgery (CSRF).
+    -->
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <div class="border border-warning rounded-circle bg-warning bg-opacity-25 p-2 mb-2">
     <img src="{{ url_for('static', filename='/images/chef-default.webp') }}" alt="Avatar" width="100" height="100"
       id="img-profile-image" class="rounded-circle">
   </div>

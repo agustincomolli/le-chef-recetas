@@ -43,7 +43,7 @@
             {% if session["user_id"] %}
             <div class="d-none d-sm-flex me-3 align-items-center">
               <ul class="navbar-nav ms-auto">
-                <li class="nav-item"><a href="/add_recipe" class="nav-link">Agregar receta</a></li>
+                <li class="nav-item"><a href="/recipe/new" class="nav-link">Agregar receta</a></li>
                 <li class="nav-item"><a href="/my_recipes" class="nav-link">Mis recetas</a></li>
               </ul>
               <ul class="navbar-nav ms-auto mt-2">
@@ -113,8 +113,9 @@
         </ul>
         <!-- Categorías: Siempre centradas -->
         <ul class="nav justify-content-center w-100 mt-2">
+          <li class="nav-item"><a href="#" class="nav-link">Ultimas</a></li>
           {% for category in categories %}
-          <li class="nav-item"><a href="#" class="nav-link">{{ category }}</a></li>
+          <li class="nav-item"><a href="#" class="nav-link">{{ category["name"] }}</a></li>
           {% endfor %}
         </ul>
       </div>
@@ -123,16 +124,16 @@
   <main class="flex-grow-1 container py-4 text-center sm-border shadow">
     <!-- Sección para mensaje Flash de Python Flask -->
     {% with messages = get_flashed_messages(with_categories=true) %}
-    {% if messages %}
-    {% for category, message in messages %}
-    <div class="alert alert-{{ category }} mx-5">
-      <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-      {{ message }}
-    </div>
-    {% endfor %}
-    {% endif %}
-
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="alert alert-{{ category }} mx-5">
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            {{ message }}
+          </div>
+        {% endfor %}
+      {% endif %}
     {% endwith %}
+    
     {% block main %}
     {% endblock %}
   </main>

@@ -22,8 +22,8 @@ class Config:
                             ("filesystem" aquí).
 
     """
-    SQLALCHEMY_DATABASE_URI = 'sqlite:///' + \
-        os.path.join(basedir, 'data', 'recipes.db')
+    database_path = os.path.join(basedir, 'data', 'recipes.db')
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///' + database_path
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SECRET_KEY = os.urandom(24)
     SESSION_PERMANENT = False

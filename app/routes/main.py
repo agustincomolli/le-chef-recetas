@@ -5,9 +5,26 @@ Contiene las rutas a cada parte de la aplicación web
 import requests
 # pylint: disable=unused-import
 from flask import Blueprint, render_template, request, redirect, url_for, flash
-from app.utils.helpers import apology
+from app.utils.helpers import apology, convert_to_webp, resize_image, login_required
+from app.utils.database import get_categories
 
 main = Blueprint('main', __name__)
+
+
+@main.route("/recipe/<int:recipe_id>", methods=["GET", "POST"])
+@main.route("/recipe/new", methods=["GET", "POST"])
+@login_required
+def add_edit_recipe(recipe_id=None):
+    if recipe_id:
+        pass
+    else:
+        recipe = None
+    categories = get_categories()
+
+    if request.method == "POST":
+        pass
+
+    return render_template("recipe-form.html", recipe=recipe, categories=categories)
 
 
 @main.route("/contact", methods=["GET", "POST"])

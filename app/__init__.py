@@ -3,6 +3,7 @@ Inicialización de la aplicación Flask.
 
 """
 from flask import Flask, render_template
+from flask_wtf.csrf import CSRFProtect
 from flask_session import Session
 from .config import Config
 from .extensions import db
@@ -17,15 +18,15 @@ def create_app():
 
     """
     app = Flask(__name__)
+    # Habilitar la protección contra CSRF en toda la aplicación.
+    # CSRF es un tipo de ataque en el que un atacante malicioso
+    # engaña a un usuario autenticado para que ejecute acciones no deseadas en un sitio web.
+    CSRFProtect(app)
     app.config.from_object(Config)
 
     # Inicializar extensiones
     db.init_app(app)
     Session(app)
-
-    # Configuración de sesión
-    app.config["SESSION_PERMANENT"] = False
-    app.config["SESSION_TYPE"] = "filesystem"
 
     # Registrar blueprints
     app.register_blueprint(main)

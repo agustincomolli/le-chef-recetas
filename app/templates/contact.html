@@ -10,7 +10,13 @@ Contacto
   <p class="mb-4">¿Tienes alguna pregunta o sugerencia? ¡Nos encantaría saber de ti!</p>
 
   <form action="/contact" method="POST" class="d-flex flex-column align-items-center mb-5 py-3 mx-auto needs-validation" novalidate>
-    <div class="form-group mb-3 d-flex flex-column align-items-start">
+    <!-- 
+      Campo oculto que contiene un token CSRF. Este token se compara con el token almacenado 
+      en el servidor para verificar la autenticidad de la solicitud y evitar ataques de 
+      falsificación de solicitudes entre sitios Cross-Site Request Forgery (CSRF).
+    -->
+     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+     <div class="form-group mb-3 d-flex flex-column align-items-start">
       <label for="name" class="form-label">Nombre</label>
       <input type="text" class="form-control account-input" id="name" name="name" required>
       <div class="invalid-feedback text-start">

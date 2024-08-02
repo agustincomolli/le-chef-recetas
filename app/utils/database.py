@@ -14,8 +14,8 @@ def insert_categories() -> None:
     Returns:
         None
     """
-    categories = ["Ultimas", "Bebidas", "Entradas",
-                  "Platos principales", "Postres", "Otros"]
+    categories = ["Bebidas", "Entradas", "Platos principales",
+                  "Postres", "Otros"]
     # Iniciar una transacción.
     with db.engine.begin() as connection:
         # Si hay categorías, salir de la función.
@@ -38,8 +38,8 @@ def get_categories() -> list[str]:
     Returns:
         list: Una lista de nombres de categorías obtenidos de la base de datos.
     """
-    result = db.session.execute(text("SELECT name FROM categories;"))
-    categories = [category[0] for category in result.fetchall()]
+    result = db.session.execute(text("SELECT * FROM categories;"))
+    categories = [{"id": category[0], "name": category[1]} for category in result.fetchall()]
     return categories
 
 
