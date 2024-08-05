@@ -18,6 +18,7 @@ document.addEventListener('DOMContentLoaded', function () {
             input = document.createElement('input');
             input.type = 'text';
             input.name = 'ingredients[]';
+            input.placeholder = "p.ej. 2 tazas de harina, tamizada";
         } else {
             const stepNumber = document.createElement("label");
             stepNumber.className = 'form-label text-start w-100';
@@ -25,6 +26,7 @@ document.addEventListener('DOMContentLoaded', function () {
             div.appendChild(stepNumber);
             input = document.createElement('textarea');
             input.name = 'steps[]';
+            input.placeholder = "Por ejemplo, combine todos los ingredientes secos en un tazón grande…"
         }
         input.className = 'form-control';
         input.required = true;

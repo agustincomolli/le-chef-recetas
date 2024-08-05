@@ -7,39 +7,138 @@
 {% block main %}
 <h2 class="mb-3 text-info">{% if recipe %}Editar{% else %}Agregar{% endif %} Receta</h2>
 <div class="container d-flex justify-content-center">
-  <form id="recipeForm" method="POST" enctype="multipart/form-data" class="justify-self-center">
-    <!-- 
-        Campo oculto que contiene un token CSRF. Este token se compara con el token almacenado 
-        en el servidor para verificar la autenticidad de la solicitud y evitar ataques de 
-        falsificación de solicitudes entre sitios Cross-Site Request Forgery (CSRF).
-      -->
+  <form id="recipeForm" method="POST" enctype="multipart/form-data" class="justify-self-center needs-validation"
+    novalidate>
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-    <div class="row mb-3">
-      <label for="title" class="form-label text-start">Título</label>
+    <div class="row mb-3 text-start">
+      <label for="title" class="form-label">Título</label>
       <input type="text" class="form-control" id="title" name="title" value="{{ recipe.title if recipe else '' }}"
-        required>
-    </div>
-    <div class="row mb-3">
-      <label for="description" class="form-label text-start">Descripción</label>
-      <textarea class="form-control" id="description" name="description">{{ recipe.description if recipe else ''
-        }}</textarea>
-    </div>
-    <div class="row mb-3">
-      <label for="image" class="form-label text-start">Imagen</label>
-      <input type="file" class="form-control" id="image" name="image" accept="image/, .png, .jpg, .jpeg, .gif, .webp">
-    </div>
-    <div class="mb-3">
-      <div class="col-6 d-flex">
-        <label for="servings" class="form-label text-start me-3">Porciones:</label>
-        <input type="number" class="form-control me-5" id="servings" name="servings"
-          value="{{ recipe.servings if recipe else '' }}" min="1">
+        required autofocus placeholder="Ponle un título a tu receta">
+      <div class="invalid-feedback">
+        Por favor, ingresa un título para tu receta.
       </div>
     </div>
-    <div class="row mb-3 gx-2">
-      <label for="prep_time" class="form-label text-start">Tiempo de Preparación:</label>
+    <div class="row mb-3 text-start">
+      <label for="image" class="form-label">Imagen</label>
+      <img src="{{ url_for('static', filename='images/others.webp') }}" alt="Imagen de la receta"
+        class="img-fluid rounded w-75 mb-3 d-flex mx-auto justify-self-center" width="300" height="300">
+      <input type="file" class="form-control" id="image" name="image" accept="image/, .png, .jpg, .jpeg, .gif, .webp"
+        aria-describedby="profile-image-help-block">
+      <div id="profile-image-help-block" class="form-text">
+        Selecciona el archivo que tendrá la imagen de tu receta. <br>
+        El archivo debe ser menor de 1MB.
+      </div>
+      <div class="invalid-feedback">
+        Por favor, selecciona una imagen válida (PNG, JPG, JPEG, GIF o WEBP) menor a 1MB.
+      </div>
+    </div>
+    <div class="row mb-3 text-start">
+      <label for="description" class="form-label">Descripción</label>
+      <textarea class="form-control" id="description" name="description"
+        placeholder="Comparte la historia detrás de tu receta y lo que la hace especial.">
+        {{ recipe.description if recipe else '' }}
+      </textarea>
+    </div>
+    <div class="row mb-3 text-start">
+      <label for="category" class="form-label">Categoría</label>
+      <select class="form-select" id="category" name="category" required>
+        <option value="" disabled selected>Elija una categoría</option>
+        {% for category in categories %}
+        <option value="{{ category.id }}" {% if recipe and recipe.category_id==category.id %}selected{% endif %}>{{
+          category.name }}</option>
+        {% endfor %}
+      </select>
+      <div class="invalid-feedback">
+        Por favor, selecciona una categoría para tu receta.
+      </div>
+    </div>
+    <div class="mb-3">
+      <div class="col-8 col-sm-6 d-flex text-start">
+        <label for="servings" class="form-label me-3">Porciones:</label>
+        <input type="number" class="form-control me-5" id="servings" name="servings"
+          value="{{ recipe.servings if recipe else '' }}" min="1" placeholder="p.ej. 8">
+        <div class="invalid-feedback">
+          Por favor, ingresa el número de porciones (mínimo 1).
+        </div>
+      </div>
+    </div>
+
+    <hr>
+
+    <h3>Ingredientes</h3>
+    <p class="text-start">
+      Ingrese un ingrediente por línea. Incluya la cantidad (es decir, tazas, cucharadas) y cualquier preparación
+      especial (es decir, tamizado, ablandado, picado).
+    </p>
+    <div id="ingredientsList">
+      {% if recipe and recipe.ingredients %}
+      {% for ingredient in recipe.ingredients %}
+      <div class="input-group mb-2 text-start">
+        <input type="text" class="form-control" name="ingredients[]" value="{{ ingredient.name }}" required>
+        <button type="button" class="btn btn-danger remove-item"><i class="bi bi-trash"></i></button>
+        <button type="button" class="btn btn-secondary move-up"><i class="bi bi-arrow-up"></i></button>
+        <button type="button" class="btn btn-secondary move-down"><i class="bi bi-arrow-down"></i></button>
+        <div class="invalid-feedback">
+          Por favor, ingresa un ingrediente válido.
+        </div>
+      </div>
+      {% endfor %}
+      {% else %}
+      <div class="input-group mb-2 text-start">
+        <input type="text" class="form-control" name="ingredients[]" required
+          placeholder="p.ej. 2 tazas de harina, tamizada">
+        <button type="button" class="btn btn-danger remove-item"><i class="bi bi-trash"></i></button>
+        <button type="button" class="btn btn-secondary move-up"><i class="bi bi-arrow-up"></i></button>
+        <button type="button" class="btn btn-secondary move-down"><i class="bi bi-arrow-down"></i></button>
+        <div class="invalid-feedback">
+          Por favor, ingresa un ingrediente válido.
+        </div>
+      </div>
+      {% endif %}
+    </div>
+    <button type="button" id="addIngredient" class="btn btn-secondary mb-3">Agregar Ingrediente</button>
+
+    <hr>
+
+    <h3>Pasos de Preparación</h3>
+    <p class="text-start">
+      Explique cómo hacer su receta, incluidas las temperaturas del horno, los tiempos de horneado o cocción, los
+      tamaños de los moldes, etc.
+    </p>
+    <div id="stepsList">
+      {% if recipe and recipe.steps %}
+      {% for step in recipe.steps %}
+      <div class="input-group mb-2 text-start">
+        <label for="steps[]" class="form-label w-100">Paso {{ loop.index }}</label>
+        <textarea class="form-control" name="steps[]" required>{{ step.content }}</textarea>
+        <button type="button" class="btn btn-danger remove-item ms-2 my-auto"><i class="bi bi-trash"></i></button>
+        <div class="invalid-feedback">
+          Por favor, describe este paso de la preparación.
+        </div>
+      </div>
+      {% endfor %}
+      {% else %}
+      <div class="input-group mb-2 text-start">
+        <label for="steps[]" class="form-label w-100">Paso 1</label>
+        <textarea class="form-control" name="steps[]" required
+          placeholder="Por ejemplo, combine todos los ingredientes secos en un tazón grande…"></textarea>
+        <button type="button" class="btn btn-danger remove-item ms-2 my-auto"><i class="bi bi-trash"></i></button>
+        <div class="invalid-feedback">
+          Por favor, describe este paso de la preparación.
+        </div>
+      </div>
+      {% endif %}
+    </div>
+    <button type="button" id="addStep" class="btn btn-secondary mb-3">Agregar Paso</button>
+
+    <hr>
+
+    <h3>Opcional</h3>
+    <div class="row mb-3 gx-2 text-start">
+      <label for="prep_time" class="form-label">Tiempo de Preparación:</label>
       <div class="col-8">
         <input type="number" class="form-control" id="prep_time" name="prep_time"
-          value="{{ recipe.prep_time if recipe else '' }}" min="1">
+          value="{{ recipe.prep_time if recipe else '' }}" min="0" placeholder="0">
       </div>
       <div class="col d-flex">
         <select class="form-select" id="prep_time_unit" name="prep_time_unit">
@@ -49,11 +148,11 @@
         </select>
       </div>
     </div>
-    <div class="row mb-3 gx-2">
-      <label for="cook_time" class="form-label text-start">Tiempo de Cocción</label>
+    <div class="row mb-3 gx-2 text-start">
+      <label for="cook_time" class="form-label">Tiempo de Cocción</label>
       <div class="col-8">
         <input type="number" class="form-control" id="cook_time" name="cook_time"
-          value="{{ recipe.cook_time if recipe else '' }}" min="1">
+          value="{{ recipe.cook_time if recipe else '' }}" min="0" placeholder="0">
       </div>
       <div class="col">
         <select class="form-select" id="cook_time_unit" name="cook_time_unit">
@@ -63,54 +162,6 @@
         </select>
       </div>
     </div>
-    <div class="row mb-3">
-      <label for="category" class="form-label text-start">Categoría</label>
-      <select class="form-select" id="category" name="category" required>
-        <option value="" disabled selected>Elija una categoría</option>
-        {% for category in categories %}
-        <option value="{{ category.id }}" {% if recipe and recipe.category_id==category.id %}selected{% endif %}>{{
-          category.name }}</option>
-        {% endfor %}
-      </select>
-    </div>
-
-    <h3>Ingredientes</h3>
-    <p class="text-start">
-      Ingrese un ingrediente por línea. Incluya la cantidad (es decir, tazas, cucharadas) y cualquier preparación
-      especial (es decir, tamizado, ablandado, picado).
-    </p>
-    <div id="ingredientsList">
-      {% if recipe %}
-      {% for ingredient in recipe.ingredients %}
-      <div class="input-group mb-2">
-        <input type="text" class="form-control" name="ingredients[]" value="{{ ingredient.name }}" required>
-        <button type="button" class="btn btn-danger remove-item"><i class="bi bi-trash"></i></button>
-        <button type="button" class="btn btn-secondary move-up"><i class="bi bi-arrow-up"></i></button>
-        <button type="button" class="btn btn-secondary move-down"><i class="bi bi-arrow-down"></i></button>
-      </div>
-      {% endfor %}
-      {% endif %}
-    </div>
-    <button type="button" id="addIngredient" class="btn btn-secondary mb-3">Agregar Ingrediente</button>
-
-    <h3>Pasos de Preparación</h3>
-    <p class="text-start">
-      Explique cómo hacer su receta, incluidas las temperaturas del horno, los tiempos de horneado o cocción, los
-      tamaños de los moldes, etc.
-    </p>
-    <div id="stepsList">
-      {% if recipe %}
-      {% for step in recipe.steps %}
-      <div class="row input-group mb-2">
-        <textarea class="form-control" name="steps[]" required>{{ step.content }}</textarea>
-        <button type="button" class="btn btn-danger remove-item"><i class="bi bi-trash"></i></button>
-        <button type="button" class="btn btn-secondary move-up"><i class="bi bi-arrow-up"></i></button>
-        <button type="button" class="btn btn-secondary move-down"><i class="bi bi-arrow-down"></i></button>
-      </div>
-      {% endfor %}
-      {% endif %}
-    </div>
-    <button type="button" id="addStep" class="btn btn-secondary mb-3">Agregar Paso</button>
 
     <div class="mb-3">
       <button type="submit" class="btn btn-primary">{% if recipe %}Actualizar{% else %}Crear{% endif %} Receta</button>
@@ -119,4 +170,5 @@
 </div>
 
 <script src="{{ url_for('static', filename='/scripts/recipe-form.js') }}"></script>
+<script src="{{ url_for('static', filename='/scripts/recipe-validation.js') }}"></script>
 {% endblock %}
