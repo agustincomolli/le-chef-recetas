@@ -42,7 +42,7 @@ class Recipe(db.Model):
                             nullable=False)
     category = db.relationship("Category", back_populates="categories")
     # Relación uno a muchos con Ingredient
-    ingredients = db.relationship("Ingredient", back_populates="recipe", 
+    ingredients = db.relationship("Ingredient", back_populates="recipe",
                                   lazy="dynamic", cascade="all, delete-orphan")
     # Relación uno a muchos con Step
     steps = db.relationship("Step", back_populates="step",

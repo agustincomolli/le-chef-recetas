@@ -1,6 +1,3 @@
-Comando tree:
-tree -I venv -I flask_session -I __pycache__ -o tree.txt
-
 .
 |-- LICENSE
 |-- app
@@ -8,6 +5,7 @@ tree -I venv -I flask_session -I __pycache__ -o tree.txt
 |   |-- config.py
 |   |-- data
 |   |   `-- recipes.db
+|   |-- extensions.py
 |   |-- models
 |   |   |-- __init__.py
 |   |   |-- categories.py
@@ -28,10 +26,18 @@ tree -I venv -I flask_session -I __pycache__ -o tree.txt
 |   |   |-- icons
 |   |   |   `-- favicon.png
 |   |   |-- images
+|   |   |   |-- 404.webp
 |   |   |   |-- background.webp
 |   |   |   |-- chef-default.webp
-|   |   |   `-- le-chef.webp
+|   |   |   |-- contact-form.webp
+|   |   |   |-- dessert.webp
+|   |   |   |-- drink.webp
+|   |   |   |-- le-chef.webp
+|   |   |   |-- main-dish.webp
+|   |   |   |-- others.webp
+|   |   |   `-- starter-dish.webp
 |   |   |-- scripts
+|   |   |   |-- account-validation.js
 |   |   |   |-- apology.js
 |   |   |   |-- bootstrap
 |   |   |   |   |-- bootstrap.bundle.js
@@ -46,7 +52,10 @@ tree -I venv -I flask_session -I __pycache__ -o tree.txt
 |   |   |   |   |-- bootstrap.js.map
 |   |   |   |   |-- bootstrap.min.js
 |   |   |   |   `-- bootstrap.min.js.map
-|   |   |   `-- custom-validation.js
+|   |   |   |-- contact-validation.js
+|   |   |   |-- profile-image-loader.js
+|   |   |   |-- recipe-form.js
+|   |   |   `-- recipe-validation.js
 |   |   `-- styles
 |   |       |-- bootstrap
 |   |       |   |-- bootstrap-grid.css
@@ -85,23 +94,29 @@ tree -I venv -I flask_session -I __pycache__ -o tree.txt
 |   |       |   |-- bootstrap.rtl.min.css
 |   |       |   `-- bootstrap.rtl.min.css.map
 |   |       |-- partials
+|   |       |   |-- account.css
+|   |       |   |-- contact.css
+|   |       |   |-- error-404.css
 |   |       |   |-- login.css
-|   |       |   `-- register.css
+|   |       |   `-- recipe.css
 |   |       `-- styles.css
 |   |-- templates
+|   |   |-- account.html
 |   |   |-- apology.html
 |   |   |-- base.html
+|   |   |-- contact.html
+|   |   |-- error-404.html
 |   |   |-- login.html
+|   |   |-- recipe-form.html
 |   |   |-- register.html
 |   |   `-- test.html
 |   `-- utils
 |       |-- database.py
 |       `-- helpers.py
-|-- flask_session
-|   `-- 2029240f6d1128be89ddc32729463129
 |-- instance
 |-- requirements.txt
 |-- run.py
+|-- tree
 `-- tree.txt
 
-17 directories, 84 files
+17 directories, 110 files

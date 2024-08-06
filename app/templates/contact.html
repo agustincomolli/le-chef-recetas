@@ -5,7 +5,7 @@ Contacto
 {% endblock %}
 
 {% block main %}
-<div class="container">
+<div class="container position-relative">
   <h1 class="mb-4">Contáctanos</h1>
   <p class="mb-4">¿Tienes alguna pregunta o sugerencia? ¡Nos encantaría saber de ti!</p>
 
@@ -46,6 +46,8 @@ Contacto
     </div>
     <button type="submit" class="btn btn-primary">Enviar mensaje</button>
   </form>
+  
+  <img src="{{ url_for('static', filename='images/contact-form.webp') }}" class="position-absolute bottom-0 start-0 ms-sm-5 w-25 h-auto" alt="Imagen de fondo">
 </div>
 
 <script src="{{ url_for('static', filename='/scripts/contact-validation.js') }}"></script>

@@ -13,15 +13,16 @@ class Step(db.Model):
 
     Atributos:
         id (int): Identificador único del paso (clave primaria).
-        content (str): Contenido del paso, detallando la acción a realizar 
+        description (str): Contenido del paso, detallando la acción a realizar 
             (requerido). Puede incluir texto multilínea.
         recipe_id (int): Identificador de la receta asociada al paso 
             (clave foránea a la tabla "recipe.id"). Este campo es obligatorio.
     """
     __tablename__ = "steps"
     id = db.Column(db.Integer, primary_key=True)
-    content = db.Column(db.Text, nullable=False)
+    description = db.Column(db.Text, nullable=False)
+    order_num = db.Column(db.Integer, nullable=False)
     # Clave foránea y relación con Recipe
-    recipe_id = db.Column(db.Integer, db.ForeignKey("recipes.id"), 
+    recipe_id = db.Column(db.Integer, db.ForeignKey("recipes.id"),
                           nullable=False)
     recipe = db.relationship("Recipe", back_populates="recipes")

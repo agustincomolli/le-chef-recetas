@@ -14,13 +14,13 @@ class Ingredient(db.Model):
 
     Atributos:
         id (int): Identificador único del ingrediente (clave primaria).
-        name (str): Nombre del ingrediente (máximo 50 caracteres).
+        description (str): Nombre del ingrediente (máximo 50 caracteres).
         recipe_id (int): Identificador de la receta asociada al ingrediente 
             (clave foránea a la tabla "recipes.id"). Este campo es obligatorio.
     """
     __tablename__ = "ingredients"
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(50), nullable=False)
+    description = db.Column(db.String(50), nullable=False)
     # Clave foránea y relación con Recipe
     recipe_id = db.Column(db.Integer, db.ForeignKey("recipes.id"),
                           nullable=False)
