@@ -9,6 +9,8 @@ from functools import wraps
 from flask import redirect, render_template, session
 from PIL import Image
 
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
+
 
 def apology(message, code=400):
     """Render message as an apology to user."""
@@ -119,6 +121,24 @@ def resize_image(input_path, output_path=None, new_size=(100, 100)):
         print(f"Valor incorrecto: {e}")
     except OSError as e:
         print(f"Error al abrir o guardar la imagen: {e}")
+
+
+def allowed_file(filename: str) -> bool:
+    """
+    Verifica si el nombre de archivo tiene una extensión permitida.
+
+    Args:
+        filename (str): El nombre del archivo a verificar.
+
+    Returns:
+        bool: True si el archivo tiene una extensión permitida, False en caso contrario.
+    """
+    # Verificar si el nombre de archivo contiene un punto (.)
+    if '.' in filename:
+        # Separar el nombre de archivo por el punto y verificar la extensión
+        extension = filename.rsplit('.', 1)[1].lower()
+        return extension in ALLOWED_EXTENSIONS
+    return False
 
 
 if __name__ == "__main__":

@@ -2,11 +2,14 @@
 Contiene las rutas a cada parte de la aplicación web
 
 """
+import os
 import requests
 # pylint: disable=unused-import
 from flask import Blueprint, render_template, request, redirect, url_for, flash
-from app.utils.helpers import apology, convert_to_webp, resize_image, login_required
-from app.utils.database import get_categories
+from flask import session, current_app
+from werkzeug.utils import secure_filename
+from app.utils.helpers import apology, convert_to_webp, resize_image, login_required, allowed_file
+from app.utils.database import get_categories, get_recipe, add_recipe, update_recipe
 
 main = Blueprint('main', __name__)
 
@@ -15,14 +18,78 @@ main = Blueprint('main', __name__)
 @main.route("/recipe/new", methods=["GET", "POST"])
 @login_required
 def add_edit_recipe(recipe_id=None):
+    """
+    Maneja la creación y edición de recetas. Si se proporciona un recipe_id, 
+    la receta correspondiente se carga para su edición. Si no, se maneja la 
+    creación de una nueva receta.
+
+    Parameters:
+    recipe_id (int): El ID de la receta a editar. Si es None, se crea una nueva receta.
+
+    Returns:
+    Renderiza el formulario de receta y maneja la lógica de guardar/actualizar la receta.
+    """
     if recipe_id:
-        pass
+        recipe = get_recipe(recipe_id)
+        if recipe is None:
+            flash("Receta no encontrada", "error")
+            return redirect(url_for("main.index"))
     else:
         recipe = None
+
     categories = get_categories()
 
     if request.method == "POST":
-        pass
+        recipe_data = {
+            "title": request.form.get("title"),
+            "description": request.form.get("description"),
+            "servings": request.form.get("servings"),
+            "prep_time": request.form.get("prep_time"),
+            "prep_time_unit": request.form.get("prep_time_unit"),
+            "cook_time": request.form.get("cook_time"),
+            "cook_time_unit": request.form.get("cook_time_unit"),
+            "user_id": session["user_id"],
+            "category_id": request.form.get("category")
+        }
+
+        ingredients = request.form.getlist("ingredients[]")
+        steps = request.form.getlist("steps[]")
+
+        # Validar entradas
+        if not recipe_data["title"] or not recipe_data["category_id"] \
+        or not ingredients or not steps:
+            flash("Por favor, complete todos los campos requeridos", "error")
+            return render_template("recipe-form.html", recipe=recipe, categories=categories)
+
+        # Procesar imagen
+        image = request.files.get("image")
+        if image and allowed_file(image.filename):
+            filename = secure_filename(image.filename)
+            image_path = os.path.join(current_app.config['UPLOAD_FOLDER'],
+                                      filename)
+            image.save(image_path)
+            webp_filename = convert_to_webp(image_path)
+            resized_filename = resize_image(webp_filename, (300, 300))
+            os.remove(image_path)
+            os.remove(webp_filename)
+            recipe_data["image_url"] = resized_filename
+        elif not recipe:
+            flash("Por favor, suba una imagen", "error")
+            return render_template("recipe-form.html", recipe=recipe, categories=categories)
+        else:
+            recipe_data["image_url"] = recipe['image_url']
+
+        # Guardar o actualizar receta
+        if recipe_id:
+            result = update_recipe(recipe_id, recipe_data, ingredients, steps)
+        else:
+            result = add_recipe(recipe_data, ingredients, steps)
+
+        if result == 0:
+            flash("Receta guardada exitosamente!", "success")
+            return redirect(url_for("main.index"))
+        else:
+            flash("Ocurrió un error al guardar la receta", "error")
 
     return render_template("recipe-form.html", recipe=recipe, categories=categories)
 

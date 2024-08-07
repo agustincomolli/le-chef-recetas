@@ -14,8 +14,16 @@ def insert_categories() -> None:
     Returns:
         None
     """
-    categories = ["Bebidas", "Entradas", "Platos principales",
-                  "Postres", "Otros"]
+    categories = [{"name": "Bebidas",
+                  "image_url": "/static/images/drink.webp"},
+                  {"name": "Entradas",
+                   "image_url": "/static/images/starter-dish.webp"},
+                  {"name": "Platos principales",
+                   "image_url": "/static/images/main-dish.webp"},
+                  {"name": "Postres",
+                   "image_url": "/static/images/dessert.webp"},
+                  {"name": "Otros",
+                   "image_url": "/static/images/others.webp"}]
     # Iniciar una transacción.
     with db.engine.begin() as connection:
         # Si hay categorías, salir de la función.
@@ -23,8 +31,11 @@ def insert_categories() -> None:
             return
 
         for category in categories:
-            connection.execute(text("INSERT INTO categories (name) VALUES (:name)"),
-                               {"name": category})
+            category_sql = "INSERT INTO categories (name, image_url) "
+            category_sql += "VALUES (:name, :image_url);"
+            connection.execute(text(category_sql),
+                               {"name": category["name"],
+                                "image_url": category["image_url"]})
         # Si alguna de las operaciones falla, se realiza un rollback automáticamente.
 
 
@@ -39,7 +50,7 @@ def get_categories() -> list[str]:
         list: Una lista de nombres de categorías obtenidos de la base de datos.
     """
     result = db.session.execute(text("SELECT * FROM categories;"))
-    categories = [{"id": category[0], "name": category[1]}
+    categories = [{"id": category[0], "name": category[1], "image_url": category[2]}
                   for category in result.fetchall()]
     return categories
 
@@ -242,167 +253,160 @@ def update_user(user_id: int, username: str, email: str, password: str,
         return 1
 
 
-def get_recipe_by_id(recipe_id: int) -> dict:
+def get_recipe(recipe_id: int) -> dict:
     """
-    Obtiene una receta de la base de datos por su ID.
+    Obtiene una receta de la base de datos, incluyendo sus ingredientes y pasos.
 
-    Args:
-        recipe_id (int): El ID de la receta a obtener.
+    Parameters:
+    recipe_id (int): El ID de la receta a obtener.
 
     Returns:
-        dict: Un diccionario con la información de la receta, o None si no se encuentra.
+    dict: Un diccionario que contiene la información de la receta, sus ingredientes y pasos.
+          Devuelve None si la receta no se encuentra o si ocurre un error de base de datos.
     """
     try:
-        with db.engine.connect() as connection:
-            sql = """
-            SELECT r.*, c.name as category_name 
-            FROM recipes r
-            JOIN categories c ON r.category_id = c.id
-            WHERE r.id = :recipe_id
-            """
-            result = connection.execute(
-                text(sql), {"recipe_id": recipe_id}).fetchone()
+        with db.engine.connect() as conn:
+            # Consultar la receta y su categoría
+            query = text(
+                """
+                SELECT r.*, c.name as category_name 
+                FROM recipes r
+                JOIN categories c ON r.category_id = c.id
+                WHERE r.id = :recipe_id;
+                """)
+            result = conn.execute(query, {"recipe_id": recipe_id}).fetchone()
+
             if result:
+                # Convertir el resultado a un diccionario
                 recipe = dict(result)
 
-                # Obtener ingredientes
-                ingredients_sql = "SELECT description FROM ingredients WHERE recipe_id = :recipe_id"
-                ingredients = connection.execute(text(ingredients_sql),
-                                                 {"recipe_id": recipe_id}).fetchall()
+                # Consultar los ingredientes de la receta
+                ingredients_sql = "SELECT description FROM ingredients "
+                ingredients_sql += "WHERE recipe_id = :recipe_id;"
+                ingredients = conn.execute(text(ingredients_sql),
+                                           {"recipe_id": recipe_id}).fetchall()
                 recipe['ingredients'] = [ing[0] for ing in ingredients]
 
-                # Obtener pasos
+                # Consultar los pasos de la receta
                 steps_sql = "SELECT description FROM steps "
-                steps_sql += "WHERE recipe_id = :recipe_id ORDER BY order_num"
-                steps = connection.execute(
-                    text(steps_sql), {"recipe_id": recipe_id}).fetchall()
+                steps_sql += "WHERE recipe_id = :recipe_id ORDER BY order_num;"
+                steps = conn.execute(text(steps_sql),
+                                     {"recipe_id": recipe_id}).fetchall()
                 recipe['steps'] = [step[0] for step in steps]
 
                 return recipe
             return None
     except SQLAlchemyError as e:
-        print(f"Error de base de datos al obtener receta: {e}")
+        print(f"Error de base de datos: {e}")
         return None
 
 
-def add_recipe(title: str, description: str, category_id: int, servings: int,
-               prep_time: int, cook_time: int, image_filename: str,
-               ingredients: list, steps: list, user_id: int) -> int:
+def add_recipe(recipe_data: dict, ingredients: list, steps: list) -> int:
     """
     Agrega una nueva receta a la base de datos.
 
-    Args:
-        title (str): Título de la receta.
-        description (str): Descripción de la receta.
-        category_id (int): ID de la categoría de la receta.
-        servings (int): Número de porciones.
-        prep_time (int): Tiempo de preparación en minutos.
-        cook_time (int): Tiempo de cocción en minutos.
-        image_filename (str): Nombre del archivo de imagen de la receta.
-        ingredients (list): Lista de ingredientes.
-        steps (list): Lista de pasos de preparación.
-        user_id (int): ID del usuario que crea la receta.
+    Parameters:
+    recipe_data (dict): Un diccionario que contiene los datos de la receta.
+                        Debe incluir las claves 'title', 'description', 'image_url', 'servings',
+                        'prep_time', 'prep_time_unit', 'cook_time', 'cook_time_unit', 'user_id' 
+                        y 'category_id'.
+    ingredients (list): Una lista de descripciones de ingredientes.
+    steps (list): Una lista de descripciones de los pasos para la receta.
 
     Returns:
-        int: ID de la receta creada si es exitoso, None si hay un error.
+    int: 0 si la operación es exitosa, 1 si hay un error.
     """
     try:
-        with db.engine.begin() as connection:
-            # Insertar la receta
-            recipe_sql = """
-            INSERT INTO recipes (title, description, category_id, servings, prep_time, cook_time, image, user_id)
-            VALUES (:title, :description, :category_id, :servings, :prep_time, :cook_time, :image, :user_id)
-            RETURNING id
-            """
-            recipe_values = {
-                "title": title, "description": description, "category_id": category_id,
-                "servings": servings, "prep_time": prep_time, "cook_time": cook_time,
-                "image": image_filename, "user_id": user_id
-            }
-            result = connection.execute(text(recipe_sql), recipe_values)
+        # Iniciar una transacción.
+        with db.engine.begin() as conn:
+            # Insertar la receta en la base de datos y obtener el ID de la receta.
+            recipe_query = text(
+                """
+                INSERT INTO recipes (title, description, image_url, servings, prep_time, 
+                prep_time_unit, cook_time, cook_time_unit, user_id, category_id)
+                VALUES (:title, :description, :image_url, :servings, :prep_time, 
+                :prep_time_unit, :cook_time, :cook_time_unit, :user_id, :category_id)
+                RETURNING id
+                """)
+            result = conn.execute(recipe_query, recipe_data)
             recipe_id = result.fetchone()[0]
 
-            # Insertar ingredientes
+            # Insertar los ingredientes en la base de datos.
             for ingredient in ingredients:
-                ingredient_sql = "INSERT INTO ingredients (recipe_id, description) "
-                ingredient_sql += "VALUES (:recipe_id, :description)"
-                connection.execute(text(ingredient_sql),
-                                   {"recipe_id": recipe_id, "description": ingredient})
+                ingredient_sql = "INSERT INTO ingredients (description, recipe_id) "
+                ingredient_sql += "VALUES (:description, :recipe_id);"
+                conn.execute(text(ingredient_sql),
+                             {"description": ingredient, "recipe_id": recipe_id})
 
-            # Insertar pasos
-            for i, step in enumerate(steps, start=1):
-                step_sql = "INSERT INTO steps (recipe_id, order_num, description) "
-                step_sql += "VALUES (:recipe_id, :order_num, :description)"
-                connection.execute(
-                    text(step_sql), {"recipe_id": recipe_id, "order_num": i, "description": step})
+            # Insertar los pasos en la base de datos, manteniendo el orden.
+            for i, step in enumerate(steps, 1):
+                step_sql = "INSERT INTO steps (description, order_num, recipe_id) "
+                step_sql += "VALUES (:description, :order_num, :recipe_id);"
+                conn.execute(text(step_sql),
+                             {"description": step, "order_num": i, "recipe_id": recipe_id})
 
-            return recipe_id
+        return 0
     except SQLAlchemyError as e:
-        print(f"Error de base de datos al agregar receta: {e}")
-        return None
+        print(f"Error de base de datos: {e}")
+        return 1
 
 
-def update_recipe(recipe_id: int, title: str, description: str, category_id: int,
-                  servings: int, prep_time: int, cook_time: int, image_filename: str,
-                  ingredients: list, steps: list) -> bool:
+def update_recipe(recipe_id: int, recipe_data: dict, ingredients: list, steps: list) -> int:
     """
     Actualiza una receta existente en la base de datos.
 
-    Args:
-        recipe_id (int): ID de la receta a actualizar.
-        title (str): Nuevo título de la receta.
-        description (str): Nueva descripción de la receta.
-        category_id (int): Nuevo ID de la categoría de la receta.
-        servings (int): Nuevo número de porciones.
-        prep_time (int): Nuevo tiempo de preparación en minutos.
-        cook_time (int): Nuevo tiempo de cocción en minutos.
-        image_filename (str): Nuevo nombre del archivo de imagen de la receta.
-        ingredients (list): Nueva lista de ingredientes.
-        steps (list): Nueva lista de pasos de preparación.
+    Parameters:
+    recipe_id (int): El ID de la receta a actualizar.
+    recipe_data (dict): Un diccionario que contiene los datos actualizados de la receta.
+                        Debe incluir las claves 'title', 'description', 'image_url', 'servings',
+                        'prep_time', 'prep_time_unit', 'cook_time', 'cook_time_unit', 'user_id' 
+                        y 'category_id'.
+    ingredients (list): Una lista de descripciones de los ingredientes actualizados.
+    steps (list): Una lista de descripciones de los pasos actualizados.
 
     Returns:
-        bool: True si la actualización es exitosa, False si hay un error.
+    int: 0 si la operación es exitosa, 1 si hay un error.
     """
     try:
-        with db.engine.begin() as connection:
-            # Actualizar la receta
-            recipe_sql = """
-            UPDATE recipes 
-            SET title = :title, description = :description, category_id = :category_id, 
-                servings = :servings, prep_time = :prep_time, cook_time = :cook_time, 
-                image = :image
-            WHERE id = :recipe_id
-            """
-            recipe_values = {
-                "recipe_id": recipe_id, "title": title, "description": description,
-                "category_id": category_id, "servings": servings, "prep_time": prep_time,
-                "cook_time": cook_time, "image": image_filename
-            }
-            connection.execute(text(recipe_sql), recipe_values)
+        # Iniciar una transacción.
+        with db.engine.begin() as conn:
+            # Actualizar la receta en la base de datos.
+            recipe_query = text(
+                """
+                UPDATE recipes 
+                SET title = :title, description = :description, image_url = :image_url, 
+                    servings = :servings, prep_time = :prep_time, prep_time_unit = :prep_time_unit, 
+                    cook_time = :cook_time, cook_time_unit = :cook_time_unit, 
+                    category_id = :category_id
+                WHERE id = :recipe_id AND user_id = :user_id
+                """)
+            # Agregar el ID de la receta al diccionario de datos.
+            recipe_data['recipe_id'] = recipe_id
+            conn.execute(recipe_query, recipe_data)
 
-            # Eliminar ingredientes y pasos existentes
-            connection.execute(text("DELETE FROM ingredients WHERE recipe_id = :recipe_id"),
-                               {"recipe_id": recipe_id})
-            connection.execute(text("DELETE FROM steps WHERE recipe_id = :recipe_id"),
-                               {"recipe_id": recipe_id})
+            # Eliminar los ingredientes y pasos antiguos de la base de datos.
+            conn.execute(text("DELETE FROM ingredients WHERE recipe_id = :recipe_id"), {
+                         "recipe_id": recipe_id})
+            conn.execute(text("DELETE FROM steps WHERE recipe_id = :recipe_id"), {
+                         "recipe_id": recipe_id})
 
-            # Insertar nuevos ingredientes
+            # Insertar los nuevos ingredientes en la base de datos.
             for ingredient in ingredients:
-                ingredient_sql = "INSERT INTO ingredients (recipe_id, description) "
-                ingredient_sql += "VALUES (:recipe_id, :description)"
-                connection.execute(text(ingredient_sql),
-                                   {"recipe_id": recipe_id, "description": ingredient})
+                ingredient_sql = "INSERT INTO ingredients (description, recipe_id) "
+                ingredient_sql += "VALUES (:description, :recipe_id);"
+                conn.execute(text(ingredient_sql),
+                             {"description": ingredient, "recipe_id": recipe_id})
 
-            # Insertar nuevos pasos
-            for i, step in enumerate(steps, start=1):
-                step_sql = "INSERT INTO steps (recipe_id, order_num, description) "
-                step_sql += "VALUES (:recipe_id, :order_num, :description)"
-                connection.execute(text(step_sql),
-                                   {"recipe_id": recipe_id,
-                                    "order_num": i,
-                                    "description": step})
+            # Insertar los nuevos pasos en la base de datos, manteniendo el orden.
+            for i, step in enumerate(steps, 1):
+                step_sql = "INSERT INTO steps (description, order_num, recipe_id) "
+                step_sql += "VALUES (:description, :order_num, :recipe_id);"
+                conn.execute(text(step_sql),
+                             {"description": step,
+                              "order_num": i,
+                              "recipe_id": recipe_id})
 
-            return True
+        return 0
     except SQLAlchemyError as e:
-        print(f"Error de base de datos al actualizar receta: {e}")
-        return False
+        print(f"Error de base de datos: {e}")
+        return 1

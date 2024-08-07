@@ -21,8 +21,9 @@
     <div class="row mb-3 text-start">
       <label for="image" class="form-label">Imagen</label>
       <img src="{{ url_for('static', filename='images/others.webp') }}" alt="Imagen de la receta"
-        class="img-fluid rounded w-75 mb-3 d-flex mx-auto justify-self-center" width="300" height="300">
-      <input type="file" class="form-control" id="image" name="image" accept="image/, .png, .jpg, .jpeg, .gif, .webp"
+        class="img-fluid rounded w-75 mb-3 d-flex mx-auto justify-self-center" width="300" height="300"
+        id="img-recipe-image">
+      <input type="file" class="form-control" id="input-recipe-image" name="image" accept="image/, .png, .jpg, .jpeg, .gif, .webp"
         aria-describedby="profile-image-help-block">
       <div id="profile-image-help-block" class="form-text">
         Selecciona el archivo que tendrá la imagen de tu receta. <br>
@@ -171,4 +172,5 @@
 
 <script src="{{ url_for('static', filename='/scripts/recipe-form.js') }}"></script>
 <script src="{{ url_for('static', filename='/scripts/recipe-validation.js') }}"></script>
+<script src="{{ url_for('static', filename='/scripts/image-loader.js') }}"></script>
 {% endblock %}

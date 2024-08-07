@@ -8,7 +8,7 @@ import os
 import base64
 from flask import Blueprint, request, redirect, render_template, session, flash, current_app
 from werkzeug.security import check_password_hash, generate_password_hash
-from app.utils.helpers import apology, convert_to_webp, resize_image, login_required
+from app.utils.helpers import apology, convert_to_webp, resize_image, login_required, allowed_file
 from app.utils.database import is_unique_username, is_unique_email
 from app.utils.database import add_user, get_user, delete_user, update_user
 
@@ -421,21 +421,3 @@ def get_profile_image(profile_image) -> bytes:
             os.unlink(temp_processed.name)
 
     return processed_image
-
-
-def allowed_file(filename: str) -> bool:
-    """
-    Verifica si el nombre de archivo tiene una extensión permitida.
-
-    Args:
-        filename (str): El nombre del archivo a verificar.
-
-    Returns:
-        bool: True si el archivo tiene una extensión permitida, False en caso contrario.
-    """
-    # Verificar si el nombre de archivo contiene un punto (.)
-    if '.' in filename:
-        # Separar el nombre de archivo por el punto y verificar la extensión
-        extension = filename.rsplit('.', 1)[1].lower()
-        return extension in {'png', 'jpg', 'jpeg', 'gif', 'webp'}
-    return False
