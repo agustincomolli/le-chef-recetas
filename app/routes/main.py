@@ -2,13 +2,10 @@
 Contiene las rutas a cada parte de la aplicación web
 
 """
-import os
 import requests
-# pylint: disable=unused-import
 from flask import Blueprint, render_template, request, redirect, url_for, flash
-from flask import session, current_app
-from werkzeug.utils import secure_filename
-from app.utils.helpers import apology, convert_to_webp, resize_image, login_required, allowed_file
+from flask import session
+from app.utils.helpers import apology, login_required, save_image
 from app.utils.database import get_categories, get_recipe, add_recipe, update_recipe
 
 main = Blueprint('main', __name__)
@@ -57,25 +54,24 @@ def add_edit_recipe(recipe_id=None):
 
         # Validar entradas
         if not recipe_data["title"] or not recipe_data["category_id"] \
-        or not ingredients or not steps:
+                or not ingredients or not steps:
             flash("Por favor, complete todos los campos requeridos", "error")
             return render_template("recipe-form.html", recipe=recipe, categories=categories)
 
         # Procesar imagen
         image = request.files.get("image")
-        if image and allowed_file(image.filename):
-            filename = secure_filename(image.filename)
-            image_path = os.path.join(current_app.config['UPLOAD_FOLDER'],
-                                      filename)
-            image.save(image_path)
-            webp_filename = convert_to_webp(image_path)
-            resized_filename = resize_image(webp_filename, (300, 300))
-            os.remove(image_path)
-            os.remove(webp_filename)
-            recipe_data["image_url"] = resized_filename
+        image_url = save_image(image)
+        if image_url:
+            recipe_data["image_url"] = image_url
         elif not recipe:
-            flash("Por favor, suba una imagen", "error")
-            return render_template("recipe-form.html", recipe=recipe, categories=categories)
+            # Si no se sube imagen, usar la de la categoría seleccionada
+            category_id = int(request.form.get("category"))
+            category = next(
+                (cat for cat in categories if cat.id == category_id), None)
+            if category:
+                recipe_data["image_url"] = category.image_url
+            else:
+                recipe_data["image_url"] = "/static/images/others.webp"
         else:
             recipe_data["image_url"] = recipe['image_url']
 

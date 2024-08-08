@@ -19,12 +19,12 @@
       </div>
     </div>
     <div class="row mb-3 text-start">
-      <label for="image" class="form-label">Imagen</label>
+      <label for="input-recipe-image" class="form-label">Imagen</label>
       <img src="{{ url_for('static', filename='images/others.webp') }}" alt="Imagen de la receta"
-        class="img-fluid rounded w-75 mb-3 d-flex mx-auto justify-self-center" width="300" height="300"
+        class="img-fluid rounded w-75 mb-3 mx-auto" width="300" height="300"
         id="img-recipe-image">
-      <input type="file" class="form-control" id="input-recipe-image" name="image" accept="image/, .png, .jpg, .jpeg, .gif, .webp"
-        aria-describedby="profile-image-help-block">
+      <input type="file" class="form-control" id="input-recipe-image" name="image"
+        accept="image/, .png, .jpg, .jpeg, .gif, .webp" aria-describedby="profile-image-help-block">
       <div id="profile-image-help-block" class="form-text">
         Selecciona el archivo que tendrá la imagen de tu receta. <br>
         El archivo debe ser menor de 1MB.
@@ -45,8 +45,10 @@
       <select class="form-select" id="category" name="category" required>
         <option value="" disabled selected>Elija una categoría</option>
         {% for category in categories %}
-        <option value="{{ category.id }}" {% if recipe and recipe.category_id==category.id %}selected{% endif %}>{{
-          category.name }}</option>
+        <option value="{{ category.id }}" data-image-url="{{ category.image_url }}" {% if recipe and
+          recipe.category_id==category.id %}selected{% endif %}>
+          {{ category.name }}
+        </option>
         {% endfor %}
       </select>
       <div class="invalid-feedback">
@@ -92,12 +94,12 @@
         <button type="button" class="btn btn-secondary move-up"><i class="bi bi-arrow-up"></i></button>
         <button type="button" class="btn btn-secondary move-down"><i class="bi bi-arrow-down"></i></button>
         <div class="invalid-feedback">
-          Por favor, ingresa un ingrediente válido.
+          Por favor, ingresa un ingrediente válido. Debe haber al menos un ingrediente.
         </div>
       </div>
       {% endif %}
     </div>
-    <button type="button" id="addIngredient" class="btn btn-secondary mb-3">Agregar Ingrediente</button>
+    <button type="button" id="addIngredient" class="btn btn-secondary my-3">Agregar Ingrediente</button>
 
     <hr>
 
@@ -114,7 +116,7 @@
         <textarea class="form-control" name="steps[]" required>{{ step.content }}</textarea>
         <button type="button" class="btn btn-danger remove-item ms-2 my-auto"><i class="bi bi-trash"></i></button>
         <div class="invalid-feedback">
-          Por favor, describe este paso de la preparación.
+          Por favor, describe este paso de la preparación. Debe haber al menos un paso.
         </div>
       </div>
       {% endfor %}
@@ -130,7 +132,7 @@
       </div>
       {% endif %}
     </div>
-    <button type="button" id="addStep" class="btn btn-secondary mb-3">Agregar Paso</button>
+    <button type="button" id="addStep" class="btn btn-secondary my-3">Agregar Paso</button>
 
     <hr>
 
@@ -164,8 +166,9 @@
       </div>
     </div>
 
-    <div class="mb-3">
-      <button type="submit" class="btn btn-primary">{% if recipe %}Actualizar{% else %}Crear{% endif %} Receta</button>
+    <div class="mb-3 mt-5">
+      <button class="btn btn-primary me-5" id="cancel-button">Cancelar</button>
+      <button type="submit" class="btn btn-success">{% if recipe %}Actualizar{% else %}Crear{% endif %} Receta</button>
     </div>
   </form>
 </div>

@@ -4,9 +4,12 @@ Funciones auxiliares.
 Este módulo contiene funciones de utilidad que se usan en varias partes de la aplicación.
 
 """
+import os
+import uuid
+from datetime import datetime
 from sys import argv
 from functools import wraps
-from flask import redirect, render_template, session
+from flask import redirect, render_template, session, current_app
 from PIL import Image
 
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
@@ -74,8 +77,12 @@ def convert_to_webp(input_path, output_path=None):
     try:
         image = Image.open(input_path)
         if output_path:
+            # Asegúrate de que el path tiene la extensión correcta
+            if not output_path.lower().endswith('.webp'):
+                output_path += '.webp'
             image.save(output_path, 'webp')
             print(f"Imagen convertida y guardada en {output_path}")
+            return output_path
         else:
             image.save('temp.webp', 'webp')
             return Image.open('temp.webp')
@@ -109,12 +116,11 @@ def resize_image(input_path, output_path=None, new_size=(100, 100)):
     """
     try:
         image = Image.open(input_path)
+        resized_image = image.resize(new_size, Image.Resampling.LANCZOS)
         if output_path:
-            resized_image = image.resize(new_size, Image.Resampling.LANCZOS)
             resized_image.save(output_path)
-            print(f"Imagen redimensionada y guardada en {output_path}")
-        else:
-            return image.resize(new_size, Image.Resampling.LANCZOS)
+            return output_path
+        return resized_image
     except FileNotFoundError:
         print(f"Archivo no encontrado: {input_path}")
     except ValueError as e:
@@ -139,6 +145,46 @@ def allowed_file(filename: str) -> bool:
         extension = filename.rsplit('.', 1)[1].lower()
         return extension in ALLOWED_EXTENSIONS
     return False
+
+
+def save_image(image_file):
+    """
+    Guarda una imagen cargada por el usuario, la convierte a formato WebP y la redimensiona.
+
+    Args:
+        image_file (werkzeug.datastructures.FileStorage): El archivo de imagen cargado.
+
+    Returns:
+        str: El nombre del archivo redimensionado si se guarda con éxito, None en caso contrario.
+    """
+    if image_file and allowed_file(image_file.filename):
+        # Generar un nombre de archivo único
+        now = datetime.now().strftime('%Y%m%d%H%M%S')
+        unique_id = str(uuid.uuid4())[:8]
+        filename = f"{now}_{unique_id}"
+
+        # Obtener la ruta completa donde se guardará la imagen
+        image_path = os.path.join(
+            current_app.config['UPLOAD_FOLDER'], filename)
+
+        # Guardar la imagen en el servidor
+        image_file.save(image_path)
+
+        # Convertir la imagen a formato WebP
+        webp_filename = convert_to_webp(image_path, image_path)
+
+        # Redimensionar la imagen convertida
+        resized_filename = resize_image(webp_filename, webp_filename, (300, 300))
+
+        # Eliminar la imagen original y la convertida
+        os.remove(image_path)
+        #os.remove(webp_filename)
+
+        # Devolver el nombre del archivo redimensionado
+        return resized_filename
+
+    # Devolver None si no se proporciona un archivo de imagen válido
+    return None
 
 
 if __name__ == "__main__":

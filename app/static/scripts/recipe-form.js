@@ -1,8 +1,12 @@
 document.addEventListener('DOMContentLoaded', function () {
-    const addIngredient = document.getElementById('addIngredient');
-    const addStep = document.getElementById('addStep');
-    const ingredientsList = document.getElementById('ingredientsList');
-    const stepsList = document.getElementById('stepsList');
+    const addIngredient = document.querySelector('#addIngredient');
+    const addStep = document.querySelector('#addStep');
+    const ingredientsList = document.querySelector('#ingredientsList');
+    const stepsList = document.querySelector('#stepsList');
+    const recipeImageElement = document.getElementById('img-recipe-image');
+    const recipeImageInput = document.getElementById('input-recipe-image');
+    const categorySelect = document.querySelector('select[name="category"]');
+    const cancelButton = document.querySelector("#cancel-button");
 
     /**
      * Crea un elemento de ingrediente o paso.
@@ -81,7 +85,13 @@ document.addEventListener('DOMContentLoaded', function () {
     document.addEventListener('click', function (e) {
         if (e.target.closest('.remove-item')) {
             // Eliminar elemento
-            e.target.closest('.input-group').remove();
+            const itemGroup = e.target.closest('.input-group');
+            if (itemGroup.parentNode.children.length > 1) {
+                // Si hay más de un elemento, eliminar el seleccionado
+                itemGroup.remove();
+                // Actualizar los números de los pasos
+                updateStepNumbers();
+            }
         } else if (e.target.closest('.move-up')) {
             // Mover elemento hacia arriba
             const item = e.target.closest('.input-group');
@@ -97,5 +107,51 @@ document.addEventListener('DOMContentLoaded', function () {
                 item.parentNode.insertBefore(next, item);
             }
         }
+    });
+
+    /**
+     * @function updateStepNumbers
+     * @description Actualiza los números de paso en la lista de pasos.
+     */
+    function updateStepNumbers() {
+        // Selecciona todos los elementos 'form-label' de los pasos de las recetas
+        const stepLabels = document.querySelectorAll('#stepsList .form-label');
+
+        // Itera sobre cada etiqueta de paso y actualiza su contenido de texto
+        stepLabels.forEach((label, index) => {
+            // Actualiza el contenido de texto de la etiqueta con el número de paso correspondiente
+            label.textContent = `Paso ${index + 1}`;
+        });
+    };
+
+    /**
+     * @event change
+     * @description Escucha los cambios en la selección de categoría y actualiza la imagen 
+     *              de la receta si no se ha cargado una imagen.
+     */
+    categorySelect.addEventListener('change', function () {
+        // Verificar si se ha cargado una imagen
+        if (!recipeImageInput.value) {
+            // Obtener la opción seleccionada
+            const selectedOption = this.options[this.selectedIndex];
+            // Obtener la URL de la imagen de los datos de la opción seleccionada
+            const imageUrl = selectedOption.dataset.imageUrl;
+            // Actualizar el elemento de la imagen de la receta con la URL de la imagen 
+            // o una imagen predeterminada
+            if (imageUrl) {
+                recipeImageElement.src = imageUrl;
+            } else {
+                recipeImageElement.src = '/static/images/others.webp';
+            }
+        }
+    });
+
+    /**
+     * @event click
+     * @description Redirige al usuario a la página de inicio cuando se hace clic 
+     *              en el botón de cancelar.
+     */
+    cancelButton.addEventListener("click", function () {
+        window.location.href = "/";
     });
 });
