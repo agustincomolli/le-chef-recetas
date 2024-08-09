@@ -10,9 +10,9 @@ from datetime import datetime
 from sys import argv
 from functools import wraps
 from flask import redirect, render_template, session, current_app
-from PIL import Image
+from PIL import Image, UnidentifiedImageError
 
-ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
 
 
 def apology(message, code=400):
@@ -158,29 +158,46 @@ def save_image(image_file):
         str: El nombre del archivo redimensionado si se guarda con éxito, None en caso contrario.
     """
     if image_file and allowed_file(image_file.filename):
-        # Generar un nombre de archivo único
-        now = datetime.now().strftime('%Y%m%d%H%M%S')
-        unique_id = str(uuid.uuid4())[:8]
-        filename = f"{now}_{unique_id}"
+        # pylint: disable=broad-exception-caught
+        try:
+            # Generar un nombre de archivo único
+            now = datetime.now().strftime('%Y%m%d%H%M%S')
+            unique_id = str(uuid.uuid4())[:8]
+            filename = f"{now}_{unique_id}"
 
-        # Obtener la ruta completa donde se guardará la imagen
-        upload_folder = current_app.config['UPLOAD_FOLDER']
-        image_path = os.path.join(upload_folder, filename)
+            # Obtener la ruta completa donde se guardará la imagen
+            upload_folder = current_app.config['UPLOAD_FOLDER']
+            image_path = os.path.join(upload_folder, filename)
 
-        # Guardar la imagen en el servidor
-        image_file.save(image_path)
+            # Guardar la imagen en el servidor
+            image_file.save(image_path)
 
-        # Convertir la imagen a formato WebP
-        webp_filename = convert_to_webp(image_path, image_path)
+            # Convertir la imagen a formato WebP
+            webp_filename = convert_to_webp(image_path, image_path)
 
-        # Redimensionar la imagen convertida
-        resized_filename = resize_image(webp_filename, webp_filename, (300, 300))
+            # Redimensionar la imagen convertida
+            resized_filename = resize_image(
+                webp_filename, webp_filename, (300, 300))
 
-        # Eliminar la imagen original y la convertida
-        os.remove(image_path)
+            # Eliminar la imagen original y la convertida
+            os.remove(image_path)
 
-        # Devolver el nombre del archivo redimensionado y su extensión
-        return os.path.basename(resized_filename)
+            # Devolver el nombre del archivo redimensionado y su extensión
+            return os.path.basename(resized_filename)
+        except UnidentifiedImageError as e:
+            current_app.logger.error(
+                f"Error al identificar el formato de la imagen: {str(e)}")
+        except ValueError as e:
+            current_app.logger.error(
+                f"Error de valor al procesar la imagen: {str(e)}")
+        except OSError as e:
+            current_app.logger.error(
+                f"Error de sistema al guardar la imagen: {str(e)}")
+        except Exception as e:
+            current_app.logger.error(
+                f"Error inesperado al guardar la imagen: {str(e)}")
+
+        return None
 
     # Devolver None si no se proporciona un archivo de imagen válido
     return None

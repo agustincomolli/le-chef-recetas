@@ -60,13 +60,21 @@ def add_edit_recipe(recipe_id=None):
 
         # Procesar imagen
         image = request.files.get("image")
-        image_url = "/static/uploads/" + save_image(image)
-        if image_url:
-            recipe_data["image_url"] = image_url
+        if image and image.filename != '':
+            # El usuario ha subido una nueva imagen
+            saved_image = save_image(image)
+            if saved_image:
+                recipe_data["image_url"] = "/static/uploads/" + saved_image
+            else:
+                message = "Error al guardar la imagen. "
+                message += "Asegúrate de que sea un formato válido (png, jpg, jpeg, gif)."
+                flash(message, "error")
+                return render_template("recipe-form.html", recipe=recipe, categories=categories)
         elif not recipe:
             # Si no se sube imagen, usar la de la categoría seleccionada
             category_id = int(request.form.get("category"))
-            category = next((cat for cat in categories if cat["id"] == category_id))
+            category = next(
+                (cat for cat in categories if cat["id"] == category_id))
             if category:
                 recipe_data["image_url"] = category["image_url"]
             else:

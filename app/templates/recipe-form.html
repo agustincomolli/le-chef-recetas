@@ -75,7 +75,7 @@
       {% if recipe and recipe.ingredients %}
       {% for ingredient in recipe.ingredients %}
       <div class="input-group mb-2 text-start">
-        <input type="text" class="form-control" name="ingredients[]" value="{{ ingredient.description }}" required>
+        <input type="text" class="form-control" name="ingredients[]" value="{{ ingredient }}" required>
         <button type="button" class="btn btn-danger remove-item"><i class="bi bi-trash"></i></button>
         <button type="button" class="btn btn-secondary move-up"><i class="bi bi-arrow-up"></i></button>
         <button type="button" class="btn btn-secondary move-down"><i class="bi bi-arrow-down"></i></button>
@@ -111,7 +111,7 @@
       {% for step in recipe.steps %}
       <div class="input-group mb-2 text-start">
         <label for="steps[]" class="form-label w-100">Paso {{ loop.index }}</label>
-        <textarea class="form-control" name="steps[]" required>{{ step.description }}</textarea>
+        <textarea class="form-control" name="steps[]" required>{{ step }}</textarea>
         <button type="button" class="btn btn-danger remove-item ms-2 my-auto"><i class="bi bi-trash"></i></button>
         <div class="invalid-feedback">
           Por favor, describe este paso de la preparación. Debe haber al menos un paso.
