@@ -60,16 +60,15 @@ def add_edit_recipe(recipe_id=None):
 
         # Procesar imagen
         image = request.files.get("image")
-        image_url = save_image(image)
+        image_url = "/static/uploads/" + save_image(image)
         if image_url:
             recipe_data["image_url"] = image_url
         elif not recipe:
             # Si no se sube imagen, usar la de la categoría seleccionada
             category_id = int(request.form.get("category"))
-            category = next(
-                (cat for cat in categories if cat.id == category_id), None)
+            category = next((cat for cat in categories if cat["id"] == category_id))
             if category:
-                recipe_data["image_url"] = category.image_url
+                recipe_data["image_url"] = category["image_url"]
             else:
                 recipe_data["image_url"] = "/static/images/others.webp"
         else:

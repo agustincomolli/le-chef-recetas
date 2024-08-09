@@ -28,4 +28,4 @@ class Config:
     SECRET_KEY = os.urandom(24)
     SESSION_PERMANENT = False
     SESSION_TYPE = "filesystem"
-    UPLOAD_FOLDER = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'static', 'uploads')
+    UPLOAD_FOLDER = os.path.join(basedir, 'static', 'uploads')

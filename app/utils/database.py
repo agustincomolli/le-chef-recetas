@@ -278,7 +278,7 @@ def get_recipe(recipe_id: int) -> dict:
 
             if result:
                 # Convertir el resultado a un diccionario
-                recipe = dict(result)
+                recipe = result._asdict()
 
                 # Consultar los ingredientes de la receta
                 ingredients_sql = "SELECT description FROM ingredients "

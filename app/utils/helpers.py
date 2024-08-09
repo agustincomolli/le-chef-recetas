@@ -164,8 +164,8 @@ def save_image(image_file):
         filename = f"{now}_{unique_id}"
 
         # Obtener la ruta completa donde se guardará la imagen
-        image_path = os.path.join(
-            current_app.config['UPLOAD_FOLDER'], filename)
+        upload_folder = current_app.config['UPLOAD_FOLDER']
+        image_path = os.path.join(upload_folder, filename)
 
         # Guardar la imagen en el servidor
         image_file.save(image_path)
@@ -178,10 +178,9 @@ def save_image(image_file):
 
         # Eliminar la imagen original y la convertida
         os.remove(image_path)
-        #os.remove(webp_filename)
 
-        # Devolver el nombre del archivo redimensionado
-        return resized_filename
+        # Devolver el nombre del archivo redimensionado y su extensión
+        return os.path.basename(resized_filename)
 
     # Devolver None si no se proporciona un archivo de imagen válido
     return None
