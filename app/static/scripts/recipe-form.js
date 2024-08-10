@@ -151,7 +151,8 @@ document.addEventListener('DOMContentLoaded', function () {
      * @description Redirige al usuario a la página de inicio cuando se hace clic 
      *              en el botón de cancelar.
      */
-    cancelButton.addEventListener("click", function () {
+    cancelButton.addEventListener("click", function (event) {
+        event.preventDefault(); // Previene cualquier acción por defecto
         window.location.href = "/";
     });
 });

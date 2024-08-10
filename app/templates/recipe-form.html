@@ -19,17 +19,22 @@
       </div>
     </div>
     <div class="row mb-3 text-start">
-      <label for="input-recipe-image" class="form-label">Imagen</label>
-      <img src="{{ recipe.image_url if recipe else url_for('static', filename='images/others.webp') }}" alt="Imagen de la receta"
-        class="img-fluid rounded w-75 mb-3 mx-auto" width="300" height="300" id="img-recipe-image">
-      <input type="file" class="form-control" id="input-recipe-image" name="image"
-        accept="image/, .png, .jpg, .jpeg, .gif, .webp" aria-describedby="profile-image-help-block">
-      <div id="profile-image-help-block" class="form-text">
-        Selecciona el archivo que tendrá la imagen de tu receta. <br>
-        El archivo debe ser menor de 1MB.
-      </div>
-      <div class="invalid-feedback">
-        Por favor, selecciona una imagen válida (PNG, JPG, JPEG, GIF o WEBP) menor a 1MB.
+      <div class="col-12">
+        <label for="input-recipe-image" class="form-label">Imagen</label>
+        <div class="text-center mb-3">
+          <img id="img-recipe-image"
+            src="{{ recipe.image_url if recipe else url_for('static', filename='images/others.webp') }}"
+            alt="Imagen de la receta" class="img-fluid rounded shadow recipe-image">
+        </div>
+        <input type="file" class="form-control" id="input-recipe-image" name="image"
+          accept="image/png, image/jpeg, image/gif, image/webp" aria-describedby="profile-image-help-block">
+        <div id="profile-image-help-block" class="form-text">
+          Selecciona el archivo que tendrá la imagen de tu receta.<br>
+          El archivo debe ser menor de 1MB.
+        </div>
+        <div class="invalid-feedback">
+          Por favor, selecciona una imagen válida (PNG, JPG, JPEG, GIF o WEBP) menor a 1MB.
+        </div>
       </div>
     </div>
     <div class="row mb-3 text-start">
@@ -165,7 +170,7 @@
     </div>
 
     <div class="mb-3 mt-5">
-      <button class="btn btn-primary me-5" id="cancel-button">Cancelar</button>
+      <button type="button" class="btn btn-primary me-5" id="cancel-button">Cancelar</button>
       <button type="submit" class="btn btn-success">{% if recipe %}Actualizar{% else %}Crear{% endif %} Receta</button>
     </div>
   </form>

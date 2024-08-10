@@ -92,41 +92,48 @@ def convert_to_webp(input_path, output_path=None):
         print(f"Error al abrir o guardar la imagen: {e}")
 
 
-def resize_image(input_path, output_path=None, new_size=(100, 100)):
+def resize_image(input_path, output_path=None, target_width=300):
     """
-    Redimensiona una imagen.
+    Redimensiona una imagen manteniendo su relación de aspecto.
 
     Args:
         input_path (str): Ruta de entrada de la imagen.
         output_path (str, optional): Ruta de salida donde se guardará la imagen redimensionada. 
             Si no se proporciona, la imagen redimensionada se retorna como un objeto 
             PIL.Image.Image.
-        new_size (tuple, optional): Tamaño nuevo de la imagen como una tupla (ancho, alto). 
-            Por defecto es (100, 100).
+        target_width (int, optional): Ancho objetivo de la imagen. Por defecto es 300.
 
     Returns:
-        PIL.Image.Image or None: Si no se proporciona un 'output_path', retorna el objeto de imagen 
-        redimensionada. Si se proporciona 'output_path', no retorna nada.
+        PIL.Image.Image or str or None: Si no se proporciona un 'output_path', retorna el objeto
+        de imagen redimensionada. Si se proporciona 'output_path', retorna la ruta del archivo 
+        guardado.
+        Retorna None si ocurre algún error.
 
     Raises:
         FileNotFoundError: Si no se encuentra el archivo en 'input_path'.
-        ValueError: Si hay un problema con el valor de 'new_size'.
+        ValueError: Si hay un problema con el valor de 'target_width'.
         OSError: Si ocurre un error al abrir o guardar la imagen.
-
     """
     try:
-        image = Image.open(input_path)
-        resized_image = image.resize(new_size, Image.Resampling.LANCZOS)
-        if output_path:
-            resized_image.save(output_path)
-            return output_path
-        return resized_image
+        with Image.open(input_path) as image:
+            # Calcular la nueva altura manteniendo la relación de aspecto
+            width_percent = target_width / float(image.size[0])
+            target_height = int((float(image.size[1]) * float(width_percent)))
+
+            resized_image = image.resize((target_width, target_height),
+                                         Image.Resampling.LANCZOS)
+
+            if output_path:
+                resized_image.save(output_path)
+                return output_path
+            return resized_image
     except FileNotFoundError:
         print(f"Archivo no encontrado: {input_path}")
     except ValueError as e:
         print(f"Valor incorrecto: {e}")
     except OSError as e:
         print(f"Error al abrir o guardar la imagen: {e}")
+    return None
 
 
 def allowed_file(filename: str) -> bool:
@@ -176,8 +183,8 @@ def save_image(image_file):
             webp_filename = convert_to_webp(image_path, image_path)
 
             # Redimensionar la imagen convertida
-            resized_filename = resize_image(
-                webp_filename, webp_filename, (300, 300))
+            resized_filename = resize_image(webp_filename, webp_filename,
+                                            target_width=300)
 
             # Eliminar la imagen original y la convertida
             os.remove(image_path)
