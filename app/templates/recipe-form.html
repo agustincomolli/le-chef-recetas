@@ -116,7 +116,7 @@
       {% for step in recipe.steps %}
       <div class="input-group mb-2 text-start">
         <label for="steps[]" class="form-label w-100">Paso {{ loop.index }}</label>
-        <textarea class="form-control" name="steps[]" required>{{ step }}</textarea>
+        <textarea class="form-control" name="steps[]" required rows="3">{{ step }}</textarea>
         <button type="button" class="btn btn-danger remove-item ms-2 my-auto"><i class="bi bi-trash"></i></button>
         <div class="invalid-feedback">
           Por favor, describe este paso de la preparación. Debe haber al menos un paso.

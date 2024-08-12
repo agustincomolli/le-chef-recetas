@@ -52,8 +52,8 @@
                   <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
                     aria-expanded="false">
                     <img class="border border-warning rounded-circle bg-warning bg-opacity-25 p-1"
-                      src="data:image/webp;base64,{{ session['profile_image'] }}" alt="Imagen de perfil" width="48" height="48"
-                      title="{{ session['username'] }}">
+                      src="data:image/webp;base64,{{ session['profile_image'] }}" alt="Imagen de perfil" width="48"
+                      height="48" title="{{ session['username'] }}">
                   </a>
                   <ul class="dropdown-menu dropdown-menu-end">
                     <li class="nav-item"><a class="dropdown-item" href="/account">Mi cuenta</a></li>
@@ -124,16 +124,16 @@
   <main class="flex-grow-1 container py-4 text-center sm-border shadow">
     <!-- Sección para mensaje Flash de Python Flask -->
     {% with messages = get_flashed_messages(with_categories=true) %}
-      {% if messages %}
-        {% for category, message in messages %}
-          <div class="alert alert-{{ category }} mx-5">
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            {{ message }}
-          </div>
-        {% endfor %}
-      {% endif %}
+    {% if messages %}
+    {% for category, message in messages %}
+    <div class="alert alert-{{ category }} mx-5">
+      <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      {{ message }}
+    </div>
+    {% endfor %}
+    {% endif %}
     {% endwith %}
-    
+
     {% block main %}
     {% endblock %}
   </main>
@@ -172,4 +172,22 @@
     </div>
   </footer>
 </body>
+<script>
+  // Almacena el título original de la página
+  let previousTitle = document.title;
+
+  // Agrega un evento para cuando la ventana pierde el enfoque (cuando el usuario cambia de pestaña o minimiza)
+  window.addEventListener("blur", () => {
+    // Guarda el título actual de la página
+    previousTitle = document.title;
+    // Cambia el título de la página a un mensaje llamativo
+    document.title = "¡No te vayas! ¡Vuelve! 😱";
+  });
+
+  // Agrega un evento para cuando la ventana gana el enfoque (cuando el usuario vuelve a la pestaña)
+  window.addEventListener("focus", () => {
+    // Restaura el título de la página al título original
+    document.title = previousTitle;
+  });
+</script>
 </html>

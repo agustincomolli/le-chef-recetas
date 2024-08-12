@@ -10,6 +10,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const cancelButton = document.querySelector("#cancel-button");
 
     const minLines = 3; // Número mínimo de líneas en un textarea
+    
 
     /**
      * Crea un nuevo elemento de entrada (input o textarea) para ingredientes o pasos.
