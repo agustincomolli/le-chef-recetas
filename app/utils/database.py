@@ -2,6 +2,7 @@
 Este módulo contiene las funciones que tocarán la base de datos.
 """
 
+from datetime import datetime, timezone
 from sqlalchemy import text
 from sqlalchemy.exc import SQLAlchemyError
 from app import db
@@ -319,13 +320,16 @@ def add_recipe(recipe_data: dict, ingredients: list, steps: list) -> int:
     try:
         # Iniciar una transacción.
         with db.engine.begin() as conn:
+            # Añadir la fecha de creación actual
+            recipe_data['created_at'] = datetime.now(timezone.utc)
+
             # Insertar la receta en la base de datos y obtener el ID de la receta.
             recipe_query = text(
                 """
                 INSERT INTO recipes (title, description, image_url, servings, prep_time, 
-                prep_time_unit, cook_time, cook_time_unit, user_id, category_id)
+                prep_time_unit, cook_time, cook_time_unit, user_id, category_id, created_at)
                 VALUES (:title, :description, :image_url, :servings, :prep_time, 
-                :prep_time_unit, :cook_time, :cook_time_unit, :user_id, :category_id)
+                :prep_time_unit, :cook_time, :cook_time_unit, :user_id, :category_id, :created_at)
                 RETURNING id
                 """)
             result = conn.execute(recipe_query, recipe_data)

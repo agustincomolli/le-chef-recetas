@@ -64,7 +64,7 @@
         <input type="number" class="form-control me-5" id="servings" name="servings"
           value="{{ recipe.servings if recipe else '' }}" min="1" placeholder="p.ej. 8">
         <div class="invalid-feedback">
-          Por favor, ingresa el número de porciones (mínimo 1).
+          Por favor, ingresa un número de porciones correcto (mínimo 1).
         </div>
       </div>
     </div>
@@ -126,7 +126,7 @@
       {% else %}
       <div class="input-group mb-2 text-start">
         <label for="steps[]" class="form-label w-100">Paso 1</label>
-        <textarea class="form-control" name="steps[]" required
+        <textarea class="form-control" name="steps[]" required rows="3"
           placeholder="Por ejemplo, combine todos los ingredientes secos en un tazón grande…"></textarea>
         <button type="button" class="btn btn-danger remove-item ms-2 my-auto"><i class="bi bi-trash"></i></button>
         <div class="invalid-feedback">

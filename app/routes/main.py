@@ -8,6 +8,15 @@ from flask import session
 from app.utils.helpers import apology, login_required, save_image
 from app.utils.database import get_categories, get_recipe, add_recipe, update_recipe
 
+# Códigos de error.
+ERROR_MUST_PROVIDE_TITLE = "Por favor, ingresa un título para tu receta."
+ERROR_IMAGE_TOO_BIG = "El archivo debe ser menor de 1MB"
+ERROR_MUST_PROVIDE_CATEGORY = "Por favor, selecciona una categoría para tu receta."
+ERROR_INVALID_SERVINGS = "Por favor, ingresa un número de porciones correcto (mínimo 1)."
+ERROR_MUST_PROVIDE_INGREDIENT = "Por favor, ingresa un ingrediente válido."
+ERROR_MUST_PROVIDE_STEP = "Por favor, describe este paso de la preparación. "
+ERROR_MUST_PROVIDE_STEP += "Debe haber al menos un paso."
+
 main = Blueprint('main', __name__)
 
 
@@ -142,3 +151,7 @@ def contact():
 def index():
     """ Página principal """
     return apology("trabajando,\n por favor espere", 403)
+
+
+def validate_recipe(form_data: dict) -> tuple:
+    pass
