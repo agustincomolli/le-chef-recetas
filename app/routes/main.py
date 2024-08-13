@@ -5,8 +5,9 @@ Contiene las rutas a cada parte de la aplicación web
 import requests
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from flask import session
-from app.utils.helpers import apology, login_required, save_image
+from app.utils.helpers import apology, login_required, save_image, allowed_file
 from app.utils.database import get_categories, get_recipe, add_recipe, update_recipe
+from app.utils.database import get_latest_recipes
 
 # Códigos de error.
 ERROR_MUST_PROVIDE_TITLE = "Por favor, ingresa un título para tu receta."
@@ -14,8 +15,10 @@ ERROR_IMAGE_TOO_BIG = "El archivo debe ser menor de 1MB"
 ERROR_MUST_PROVIDE_CATEGORY = "Por favor, selecciona una categoría para tu receta."
 ERROR_INVALID_SERVINGS = "Por favor, ingresa un número de porciones correcto (mínimo 1)."
 ERROR_MUST_PROVIDE_INGREDIENT = "Por favor, ingresa un ingrediente válido."
-ERROR_MUST_PROVIDE_STEP = "Por favor, describe este paso de la preparación. "
-ERROR_MUST_PROVIDE_STEP += "Debe haber al menos un paso."
+ERROR_MUST_PROVIDE_STEP = "Debe haber al menos un paso en la preparación.."
+
+# Código OK
+CODE_OK = "ok"
 
 main = Blueprint('main', __name__)
 
@@ -62,6 +65,10 @@ def add_edit_recipe(recipe_id=None):
         steps = request.form.getlist("steps[]")
 
         # Validar entradas
+        message, code = validate_recipe(recipe_data, ingredients, steps)
+        if message != CODE_OK:
+            return apology(message, code)
+
         if not recipe_data["title"] or not recipe_data["category_id"] \
                 or not ingredients or not steps:
             flash("Por favor, complete todos los campos requeridos", "error")
@@ -142,16 +149,139 @@ def contact():
 
         # Redirigir a la página principal después del envío.
         return redirect("/")
-    else:
-        # Renderizar la plantilla de contacto si el método es GET.
-        return render_template("contact.html")
+
+    # Renderizar la plantilla de contacto si el método es GET.
+    return render_template("contact.html")
 
 
 @main.route("/")
 def index():
     """ Página principal """
-    return apology("trabajando,\n por favor espere", 403)
+    # return apology("trabajando,\n por favor espere", 403)
+    latest_recipes = get_latest_recipes(limit=10)
+    return render_template('index.html', recipes=latest_recipes)
+
+def validate_recipe(recipe: dict, ingredients: list, steps: list) -> tuple:
+    """
+    Valida los datos de una receta, incluyendo sus ingredientes y pasos.
+
+    Args:
+        recipe (dict): Un diccionario con los datos de la receta.
+        ingredients (list): Una lista con los ingredientes de la receta.
+        steps (list): Una lista con los pasos de la receta.
+
+    Returns:
+        tuple: Un mensaje y un código de estado HTTP.
+    """
+    validations = []
+    validations.append(validate_title(recipe["title"]))
+    image = request.files.get("image")
+    validations.append(validate_image(image))
+    validations.append(validate_category(recipe["category_id"]))
+    validations.append(validate_servings(recipe["servings"]))
+    validations.append(validate_ingredients(ingredients))
+    validations.append(validate_steps(steps))
+
+    # Comprobar cada validación
+    for validation in validations:
+        message, code = validation
+        if message != CODE_OK:
+            return message, code
+
+    return CODE_OK, 200
 
 
-def validate_recipe(form_data: dict) -> tuple:
-    pass
+def validate_title(title: str) -> tuple:
+    """
+    Valida el título de una receta.
+
+    Args:
+        title (str): El título de la receta.
+
+    Returns:
+        tuple: Un mensaje y un código de estado HTTP.
+    """
+    if not title:
+        return ERROR_MUST_PROVIDE_TITLE, 400
+
+    return CODE_OK, 200
+
+
+def validate_image(image) -> tuple:
+    """
+    Valida la imagen de una receta.
+
+    Args:
+        image: La imagen de la receta.
+
+    Returns:
+        tuple: Un mensaje y un código de estado HTTP.
+    """
+    if image and allowed_file(image.filename):
+        if image.content_length > 1048576:  # 1MB en bytes
+            return ERROR_IMAGE_TOO_BIG, 400
+    return CODE_OK, 200
+
+
+def validate_category(category_id: str) -> tuple:
+    """
+    Valida la categoría de una receta.
+
+    Args:
+        category_id (str): El ID de la categoría.
+
+    Returns:
+        tuple: Un mensaje y un código de estado HTTP.
+    """
+    if not category_id:
+        return ERROR_MUST_PROVIDE_CATEGORY, 400
+
+    return CODE_OK, 200
+
+
+def validate_servings(servings: str) -> tuple:
+    """
+    Valida el número de porciones de una receta.
+
+    Args:
+        servings (str): El número de porciones.
+
+    Returns:
+        tuple: Un mensaje y un código de estado HTTP.
+    """
+    if servings and int(servings) < 1:
+        return ERROR_INVALID_SERVINGS, 400
+
+    return CODE_OK, 200
+
+
+def validate_ingredients(ingredients: list) -> tuple:
+    """
+    Valida los ingredientes de una receta.
+
+    Args:
+        ingredients (list): Una lista de ingredientes.
+
+    Returns:
+        tuple: Un mensaje y un código de estado HTTP.
+    """
+    if not ingredients or ingredients[0] == "":
+        return ERROR_MUST_PROVIDE_INGREDIENT, 400
+
+    return CODE_OK, 200
+
+
+def validate_steps(steps: list) -> tuple:
+    """
+    Valida los pasos de una receta.
+
+    Args:
+        steps (list): Una lista de pasos.
+
+    Returns:
+        tuple: Un mensaje y un código de estado HTTP.
+    """
+    if not steps or steps[0] == "":
+        return ERROR_MUST_PROVIDE_STEP, 400
+
+    return CODE_OK, 200

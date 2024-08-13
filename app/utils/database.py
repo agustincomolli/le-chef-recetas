@@ -414,3 +414,23 @@ def update_recipe(recipe_id: int, recipe_data: dict, ingredients: list, steps: l
     except SQLAlchemyError as e:
         print(f"Error de base de datos: {e}")
         return 1
+
+
+def get_latest_recipes(limit: int = 10) -> list:
+    """
+    Obtiene las últimas recetas agregadas a la base de datos.
+
+    Args:
+        limit (int): La cantidad de recetas a obtener. Por defecto es 10.
+
+    Returns:
+        list: Una lista de diccionarios con las últimas recetas.
+    """
+    recipes_sql = "SELECT * FROM recipes ORDER BY created_at DESC LIMIT :limit;"
+    result = db.session.execute(text(recipes_sql), {"limit": limit})
+    # Convertir el resultado a un diccionario
+    recipes = [{"id": recipe[0],
+                "title": recipe[1],
+                "description": recipe[2],
+                "image_url": recipe[4]} for recipe in result.fetchall()]
+    return recipes
