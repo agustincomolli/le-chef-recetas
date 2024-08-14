@@ -246,7 +246,6 @@ def update_user(user_id: int, username: str, email: str, password: str,
                       "profile_image": profile_image,
                       "user_id": user_id
                       }
-            print(sql)
             connection.execute(text(sql), values)
             return 0
     except Exception as e:
@@ -416,21 +415,59 @@ def update_recipe(recipe_id: int, recipe_data: dict, ingredients: list, steps: l
         return 1
 
 
-def get_latest_recipes(limit: int = 10) -> list:
+def get_recipes(page: int = 1, per_page: int = 20, category_id: int = None) -> tuple:
     """
-    Obtiene las últimas recetas agregadas a la base de datos.
+    Obtiene las recetas de la base de datos, con paginación y opción de filtrar por categoría.
 
     Args:
-        limit (int): La cantidad de recetas a obtener. Por defecto es 10.
+        page (int): Número de página actual. Por defecto es 1.
+        per_page (int): Cantidad de recetas por página. Por defecto es 20.
+        category_id (int): ID de la categoría para filtrar. Si es None, se obtienen todas 
+        las recetas.
 
     Returns:
-        list: Una lista de diccionarios con las últimas recetas.
+        tuple: Una tupla que contiene:
+            - list: Una lista de diccionarios con las recetas.
+            - int: El número total de recetas.
     """
-    recipes_sql = "SELECT * FROM recipes ORDER BY created_at DESC LIMIT :limit;"
-    result = db.session.execute(text(recipes_sql), {"limit": limit})
-    # Convertir el resultado a un diccionario
-    recipes = [{"id": recipe[0],
-                "title": recipe[1],
-                "description": recipe[2],
-                "image_url": recipe[4]} for recipe in result.fetchall()]
-    return recipes
+    # Calcular el desplazamiento para la paginación
+    offset = (page - 1) * per_page
+
+    # Consulta SQL base para obtener las recetas
+    recipes_sql = """
+    SELECT r.id, r.title, r.description, r.image_url, r.created_at, c.name as category_name
+    FROM recipes r
+    JOIN categories c ON r.category_id = c.id
+    """
+
+    # Agregar condición de filtrado por categoría si se proporciona
+    if category_id is not None:
+        recipes_sql += " WHERE r.category_id = :category_id"
+
+    recipes_sql += """
+    ORDER BY r.created_at DESC
+    LIMIT :limit OFFSET :offset;
+    """
+
+    # Consulta SQL para obtener el número total de recetas
+    count_sql = "SELECT COUNT(*) FROM recipes"
+    if category_id is not None:
+        count_sql += " WHERE category_id = :category_id"
+
+    with db.engine.connect() as conn:
+        # Preparar los parámetros para la consulta
+        params = {"limit": per_page, "offset": offset}
+        if category_id is not None:
+            params["category_id"] = category_id
+
+        # Ejecutar la consulta para obtener las recetas
+        result = conn.execute(text(recipes_sql), params)
+        # Convertir los resultados en una lista de diccionarios
+        recipes = [row._asdict() for row in result]
+
+        # Ejecutar la consulta para obtener el número total de recetas
+        params = {}
+        if category_id:
+            params['category_id'] = category_id
+        total_count = conn.execute(text(count_sql), params).scalar()
+    return recipes, total_count

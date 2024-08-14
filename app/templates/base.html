@@ -112,10 +112,16 @@
           </li>
         </ul>
         <!-- Categorías: Siempre centradas -->
-        <ul class="nav justify-content-center w-100 mt-2">
-          <li class="nav-item"><a href="#" class="nav-link">Ultimas</a></li>
+        <ul class="nav nav-tabs border-bottom-0 justify-content-center w-100 mt-2">
+          <li class="nav-item">
+            <a class="nav-link {% if not current_category %}active{% endif %}"
+              href="{{ url_for('main.index') }}">Últimas</a>
+          </li>
           {% for category in categories %}
-          <li class="nav-item"><a href="#" class="nav-link">{{ category["name"] }}</a></li>
+          <li class="nav-item">
+            <a class="nav-link {% if current_category == category.id %}active{% endif %}"
+              href="{{ url_for('main.index', category_id=category.id) }}">{{ category.name }}</a>
+          </li>
           {% endfor %}
         </ul>
       </div>

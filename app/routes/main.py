@@ -2,12 +2,13 @@
 Contiene las rutas a cada parte de la aplicación web
 
 """
+from math import ceil
 import requests
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from flask import session
 from app.utils.helpers import apology, login_required, save_image, allowed_file
 from app.utils.database import get_categories, get_recipe, add_recipe, update_recipe
-from app.utils.database import get_latest_recipes
+from app.utils.database import get_recipes
 
 # Códigos de error.
 ERROR_MUST_PROVIDE_TITLE = "Por favor, ingresa un título para tu receta."
@@ -155,11 +156,45 @@ def contact():
 
 
 @main.route("/")
-def index():
-    """ Página principal """
-    # return apology("trabajando,\n por favor espere", 403)
-    latest_recipes = get_latest_recipes(limit=10)
-    return render_template('index.html', recipes=latest_recipes)
+@main.route("/category/<int:category_id>")
+def index(category_id=None):
+    """
+    Renderiza la página de inicio mostrando las recetas con paginación.
+    Si se proporciona un category_id, filtra las recetas por esa categoría.
+
+    Args:
+        category_id (int, optional): El ID de la categoría para filtrar las recetas.
+
+    Returns:
+        Response: Renderiza la plantilla 'index.html' con los datos de las recetas,
+                  el número de página actual, el número total de páginas y la cantidad 
+                  de recetas por página.
+    """
+    page = request.args.get('page', 1, type=int)
+    per_page = 20
+
+    recipes, total_count = get_recipes(page, per_page, category_id)
+    total_pages = ceil(total_count / per_page)
+
+    categories = get_categories()
+
+    # Obtener el nombre de la categoría actual.
+    current_category_name = None
+    if category_id:
+        for category in categories:
+            if category["id"] == category_id:
+                current_category_name = category["name"]
+                break
+
+    return render_template('index.html',
+                           recipes=recipes,
+                           page=page,
+                           total_pages=total_pages,
+                           per_page=per_page,
+                           categories=categories,
+                           current_category=category_id,
+                           current_category_name=current_category_name)
+
 
 def validate_recipe(recipe: dict, ingredients: list, steps: list) -> tuple:
     """
