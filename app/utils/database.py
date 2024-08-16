@@ -269,9 +269,10 @@ def get_recipe(recipe_id: int) -> dict:
             # Consultar la receta y su categoría
             query = text(
                 """
-                SELECT r.*, c.name as category_name 
+                SELECT r.*, c.name as category_name, u.username as username 
                 FROM recipes r
                 JOIN categories c ON r.category_id = c.id
+                JOIN users u ON r.user_id = u.id
                 WHERE r.id = :recipe_id;
                 """)
             result = conn.execute(query, {"recipe_id": recipe_id}).fetchone()

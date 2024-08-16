@@ -3,6 +3,7 @@ Contiene las rutas a cada parte de la aplicación web
 
 """
 from math import ceil
+from datetime import datetime
 import requests
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from flask import session
@@ -194,6 +195,35 @@ def index(category_id=None):
                            categories=categories,
                            current_category=category_id,
                            current_category_name=current_category_name)
+
+
+@main.route("/recipe/view/<int:recipe_id>")
+def view_recipe(recipe_id):
+    """
+    Muestra los detalles de una receta específica.
+
+    Args:
+        recipe_id (int): El ID de la receta a visualizar.
+
+    Returns:
+        Response: Renderiza la plantilla 'view-recipe.html' con los detalles de la receta.
+                  Si la receta no se encuentra, redirige a la página de inicio con un 
+                  mensaje de error.
+    """
+    recipe = get_recipe(recipe_id)
+
+    # Verificar si la receta existe
+    if recipe is None:
+        flash("Receta no encontrada", "error")
+        return redirect(url_for("main.index"))
+
+    # Convertir created_at a datetime si es una cadena
+    if isinstance(recipe['created_at'], str):
+        date_string = recipe['created_at'].split('.')[0]
+        recipe['created_at'] = datetime.strptime(date_string,
+                                                 '%Y-%m-%d %H:%M:%S')
+
+    return render_template("view-recipe.html", recipe=recipe)
 
 
 def validate_recipe(recipe: dict, ingredients: list, steps: list) -> tuple:

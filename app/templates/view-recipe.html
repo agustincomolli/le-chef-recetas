@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+
+{% block title %}Ver Receta{% endblock %}
+
+{% block main %}
+<main class="container py-4 text-center">
+  <div class="d-flex justify-content-end mb-3">
+    <button class="btn btn-outline-primary me-5" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Imprimir Receta"
+      onclick="printRecipe()">
+      <i class="bi bi-printer"></i>
+    </button>
+  </div>
+
+  <h1 class="mb-4">{{ recipe.title }}</h1>
+
+  <!-- Información de la receta -->
+  <div class="row mb-4">
+    <div class="col-md-6">
+      <img src="{{ recipe.image_url }}" class="img-fluid rounded" alt="{{ recipe.title }}">
+    </div>
+    <div class="col-md-6 text-start">
+      <p><strong>Descripción:</strong> {{ recipe.description }}</p>
+      <p><strong>Creada por:</strong> {{ recipe.username }}</p>
+      <p><strong>Fecha de creación:</strong> {{ recipe.created_at.strftime('%d/%m/%Y') }}</p>
+      <p><strong>Porciones:</strong> {{ recipe.servings }}</p>
+      <p><strong>Tiempo de preparación:</strong> {{ recipe.prep_time }} {{ recipe.prep_time_unit }}</p>
+      <p><strong>Tiempo de cocción:</strong> {{ recipe.cook_time }} {{ recipe.cook_time_unit }}</p>
+    </div>
+  </div>
+
+  <!-- Ingredientes -->
+  <h2 class="mb-3">Ingredientes</h2>
+  <ul class="mb-4">
+    {% for ingredient in recipe.ingredients %}
+    <li >{{ ingredient }}</li>
+    {% endfor %}
+  </ul>
+
+  <!-- Pasos -->
+  <h2 class="mb-3">Instrucciones</h2>
+  <ol>
+    {% for step in recipe.steps %}
+    <li>{{ step }}</li>
+    {% endfor %}
+  </ol>
+
+  <!-- Botón de impresión -->
+  <div class="mt-4">
+    <button class="btn btn-primary" onclick="printRecipe()">Imprimir receta</button>
+  </div>
+</main>
+
+<script>
+  function printRecipe() {
+    const printWindow = window.open('', '', 'height=842,width=595'); // Tamaño A4 en px (210mm x 297mm)
+    printWindow.document.write('<html><head><title>Imprimir Receta</title>');
+    printWindow.document.write('<link rel="stylesheet" href="{{ url_for("static", filename="styles/bootstrap/bootstrap.min.css") }}">');
+    printWindow.document.write('<style>');
+    printWindow.document.write('body { font-family: Arial, sans-serif; margin: 20px; }');
+    printWindow.document.write('header { text-align: center; margin-bottom: 20px; }');
+    printWindow.document.write('header img { height: 80px; }');
+    printWindow.document.write('header h1, header h2 { font-family: Pacifico, cursive; margin: 0; }');
+    printWindow.document.write('h1 { font-size: 24px; margin-bottom: 10px; }');
+    printWindow.document.write('h2 { font-size: 20px; margin-bottom: 10px; }');
+    printWindow.document.write('ul, ol { margin: 0; padding: 0; list-style: none; }');
+    printWindow.document.write('li { margin-bottom: 10px; }');
+    printWindow.document.write('</style>');
+    printWindow.document.write('</head><body>');
+    printWindow.document.write('<header><img src="{{ url_for("static", filename="images/le-chef.webp") }}" alt="Logo"> <h1>Le Chef</h1> <h2>Recetas de cocina</h2></header>');
+    printWindow.document.write('<h1>{{ recipe.title }}</h1>');
+    printWindow.document.write('<img src="{{ recipe.image_url }}" style="max-width: 100%; height: auto;" alt="{{ recipe.title }}">');
+    printWindow.document.write('<p><strong>Descripción:</strong> {{ recipe.description }}</p>');
+    printWindow.document.write('<p><strong>Creada por:</strong> {{ recipe.username }}</p>');
+    printWindow.document.write('<p><strong>Fecha de creación:</strong> {{ recipe.created_at.strftime("%d/%m/%Y") }}</p>');
+    printWindow.document.write('<p><strong>Porciones:</strong> {{ recipe.servings }}</p>');
+    printWindow.document.write('<p><strong>Tiempo de preparación:</strong> {{ recipe.prep_time }} {{ recipe.prep_time_unit }}</p>');
+    printWindow.document.write('<p><strong>Tiempo de cocción:</strong> {{ recipe.cook_time }} {{ recipe.cook_time_unit }}</p>');
+    printWindow.document.write('<h2>Ingredientes</h2><ul>');
+    {% for ingredient in recipe.ingredients %}
+    printWindow.document.write('<li>{{ ingredient }}</li>');
+    {% endfor %}
+    printWindow.document.write('</ul>');
+    printWindow.document.write('<h2>Instrucciones</h2><ol>');
+    {% for step in recipe.steps %}
+    printWindow.document.write('<li>{{ step }}</li>');
+    {% endfor %}
+    printWindow.document.write('</ol>');
+    printWindow.document.write('</body></html>');
+    printWindow.document.close();
+    printWindow.focus();
+    printWindow.print();
+  }</script>
+{% endblock %}

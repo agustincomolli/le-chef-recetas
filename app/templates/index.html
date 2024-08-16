@@ -24,7 +24,7 @@
             <div class="card-body d-flex flex-column">
                 <h5 class="card-title">{{ recipe.title }}</h5>
                 <p class="card-text flex-grow-1">{{ recipe.description[:100] }}...</p>
-                <a href="{{ url_for('main.add_edit_recipe', recipe_id=recipe.id) }}" class="btn btn-primary mt-auto">Ver
+                <a href="{{ url_for('main.view_recipe', recipe_id=recipe.id) }}" class="btn btn-primary mt-auto">Ver
                     receta</a>
             </div>
         </div>
