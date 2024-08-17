@@ -3,15 +3,18 @@
 {% block title %}Ver Receta{% endblock %}
 
 {% block main %}
-<main class="container py-4 text-center">
-  <div class="d-flex justify-content-end mb-3">
-    <button class="btn btn-outline-primary me-5" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Imprimir Receta"
+<article class="container">
+  <header class="d-flex align-items-center w-100 mb-3">
+    <h1 class="mb-0 py-2 justify-self-center mx-auto">{{ recipe.title }}</h1>
+    <button class="btn btn-outline-primary justify-self-end me-3" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Imprimir Receta"
       onclick="printRecipe()">
       <i class="bi bi-printer"></i>
     </button>
-  </div>
+  </header>
+</article>
 
-  <h1 class="mb-4">{{ recipe.title }}</h1>
+<main class="container py-4 text-center">
+
 
   <!-- Información de la receta -->
   <div class="row mb-4">
@@ -32,7 +35,7 @@
   <h2 class="mb-3">Ingredientes</h2>
   <ul class="mb-4">
     {% for ingredient in recipe.ingredients %}
-    <li >{{ ingredient }}</li>
+    <li>{{ ingredient }}</li>
     {% endfor %}
   </ul>
 
