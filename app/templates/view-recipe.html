@@ -3,9 +3,9 @@
 {% block title %}Ver Receta{% endblock %}
 
 {% block main %}
-<article class="container" id="top">
+<article class="container px-sm-5" id="top">
   <header class="d-flex align-items-center w-100 mb-4">
-    <h1 class="mb-0 py-2 justify-self-center mx-auto">{{ recipe.title }}</h1>
+    <h1 class="mb-0 py-2 justify-self-center mx-auto px-3">{{ recipe.title }}</h1>
     <!-- Botón de impresión -->
     <button class="btn btn-outline-primary justify-self-end me-3" data-bs-toggle="tooltip" data-bs-placement="bottom"
       title="Imprimir Receta" id="print-recipe">
@@ -15,11 +15,11 @@
 
   <!-- Información de la receta -->
   <section class="row mb-2">
-    <div class="col-sm-6 mb-3">
-      <img src="{{ recipe.image_url }}" class="img-fluid rounded shadow" alt="{{ recipe.title }}">
+    <div class="mb-5">
+      <img src="{{ recipe.image_url }}" class="img-fluid rounded shadow-lg" alt="{{ recipe.title }}" width="400px">
     </div>
-    <div class="col-sm-6 text-start pe-5">
-      <p><strong>Descripción:</strong> {{ recipe.description }}</p>
+    <div class="text-start">
+      <p class="fs-5"><strong>Descripción:</strong> {{ recipe.description }}</p>
       <p><strong>Creada por:</strong> {{ recipe.username }}</p>
       <p><strong>Fecha de creación:</strong> {{ recipe.created_at.strftime('%d/%m/%Y') }}</p>
       <div class="row text-center mt-4 gx-3 d-flex">
@@ -42,32 +42,34 @@
     </div>
   </section>
 
+  <hr>
+
   <!-- Ingredientes -->
-  <section class="row mb-4 text-start mx-3">
+  <section class="row mb-4 text-start ">
     <h2 class="mb-3">Ingredientes</h2>
     <ul class="mb-4">
       {% for ingredient in recipe.ingredients %}
-      <li class="mb-3">{{ ingredient }}</li>
+      <li class="mb-3 fs-5">{{ ingredient }}</li>
       {% endfor %}
     </ul>
   </section>
 
   <!-- Pasos -->
-  <section class="row mb-4 text-start mx-3">
+  <section class="row mb-4 text-start ">
     <h2 class="mb-3">Instrucciones</h2>
     {% for step in recipe.steps %}
-    <p class="mb-1"><strong>Paso {{ loop.index }}:</strong></p>
-    <p class="mb-4">{{ step }}</p>
+    <p class="mb-1 fs-5"><strong>Paso {{ loop.index }}:</strong></p>
+    <p class="mb-4 fs-5">{{ step }}</p>
     {% endfor %}
   </section>
 
 
   <section class="row text-center mt-5 no-print">
     <div>
-      <a href="#top" class="btn btn-primary me-4">
+      <a href="#top" class="btn btn-primary btn-lg me-4">
         <i class="bi bi-arrow-up-circle-fill"></i> Volver arriba
       </a>
-      <a href="/" class="btn btn-outline-primary">
+      <a href="/" class="btn btn-outline-primary btn-lg">
         <i class="bi bi-house-door-fill"></i> Página principal
       </a>
     </div>
