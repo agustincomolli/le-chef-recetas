@@ -25,7 +25,7 @@ function printRecipe() {
                     font-family: Arial, sans-serif;
                     line-height: 1.5;
                     color: #333;
-                    font-size: 14px;
+                    font-size: 12px;
                     background-color: #f9f9f9;
                 }
                 .print-container {
@@ -37,24 +37,30 @@ function printRecipe() {
                 }
                 h1 {
                     color: #2c3e50;
-                    font-size: 24px;
-                    margin-bottom: 20px;
+                    font-size: 20px;
+                    margin-bottom: 0px;
                     border-bottom: 1px solid #eee;
                     padding-bottom: 10px;
                 }
                 h2 {
                     color: #34495e;
-                    font-size: 18px;
+                    font-size: 16px;
                     margin-top: 20px;
                     margin-bottom: 10px;
                 }
                 p {
                     margin: 0 0 10px;
                 }
+                p.step {
+                    margin-bottom: 0px;
+                }
                 img {
+                    display: block;
+                    margin: 0 auto 20px auto;
                     max-width: 100%;
+                    width: 300px;
                     height: auto;
-                    margin-bottom: 20px;
+                    border-radius: 8px;
                 }
                 ul, ol {
                     margin: 0 0 20px 20px;
@@ -64,9 +70,11 @@ function printRecipe() {
                     margin-bottom: 5px;
                 }
                 .meta-info {
-                    font-size: 12px;
+                    font-size: 8px;
                     color: #7f8c8d;
                     margin-bottom: 20px;
+                    display: flex;
+                    justify-content: space-between;
                 }
                 .section {
                     margin-bottom: 30px;
@@ -104,6 +112,7 @@ function printRecipe() {
         // Ajustar la estructura si es necesario
         const title = printWindow.document.querySelector('h1');
         if (title) {
+            // Crear y agregar la información meta con justificación entre izquierda y derecha
             const metaInfo = printWindow.document.createElement('div');
             metaInfo.className = 'meta-info';
 
@@ -113,14 +122,26 @@ function printRecipe() {
 
             if (createdByText && creationDateText) {
                 metaInfo.innerHTML = `
-                    <p>Creada por: ${createdByText.textContent.split(':')[1].trim()}</p>
-                    <p>Fecha de creación: ${creationDateText.textContent.split(':')[1].trim()}</p>
+                    <span>${createdByText.textContent}</span>
+                    <span>${creationDateText.textContent}</span>
                 `;
                 title.after(metaInfo);
+
+                // Eliminar los textos de "Creada por:" y "Fecha de creación:" después de agregarlos a la meta-info
+                createdByText.remove();
+                creationDateText.remove();
             } else {
                 console.error('No se encontraron los elementos con la información meta');
             }
         }
+
+        // Seleccionar todos los párrafos y aplicar estilo a los que contienen "Paso"
+        const paragraphs = printWindow.document.querySelectorAll('p');
+        paragraphs.forEach(p => {
+            if (p.textContent.includes('Paso')) {
+                p.classList.add('step');
+            }
+        });
 
         printWindow.print();
         printWindow.close();
