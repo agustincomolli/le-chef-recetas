@@ -1,7 +1,5 @@
 // Función para imprimir la receta
 function printRecipe() {
-    console.log('Función printRecipe() llamada');
-
     // Obtener el contenido de la receta
     const recipeContent = document.querySelector('article');
 
@@ -10,8 +8,6 @@ function printRecipe() {
         return;
     }
 
-    console.log('Contenido de la receta encontrado');
-
     // Crear una nueva ventana
     const printWindow = window.open('', '_blank');
 
@@ -19,7 +15,7 @@ function printRecipe() {
     printWindow.document.write(`
         <html>
         <head>
-            <title>Imprimir Receta</title>
+            <title>Le Chef recetas de cocina</title>
             <style>
                 body {
                     font-family: Arial, sans-serif;
@@ -150,10 +146,8 @@ function printRecipe() {
 
 // Agregar el evento de clic al botón de imprimir cuando el DOM esté cargado
 document.addEventListener('DOMContentLoaded', function () {
-    console.log('DOM cargado, buscando botón de imprimir');
     const printButton = document.querySelector('#print-recipe');
     if (printButton) {
-        console.log('Botón de imprimir encontrado, agregando evento de clic');
         printButton.addEventListener('click', printRecipe);
     } else {
         console.error('No se encontró el botón de imprimir');
