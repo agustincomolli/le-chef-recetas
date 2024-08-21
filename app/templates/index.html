@@ -10,7 +10,7 @@
     <h2 class="text-danger">No hay recetas en: "{{ current_category_name }}"</h2>
 </div>
 {% else %}
-{% if not current_category_id %}
+{% if not current_category %}
 <h2 class="mb-3 text-info">Últimas</h2>
 {% else %}
 <h2 class="mb-3 text-info">{{ current_category_name }}</h2>
@@ -18,8 +18,8 @@
 
 <div class="row justify-content-center">
     {% for recipe in recipes %}
-    <div class="col-md-4 mb-4">
-        <div class="card h-100">
+    <div class="mb-4 col-md-6 col-lg-4 col-xl-3 d-flex justify-content-center">
+        <div class="card h-100 w-100 mx-auto">
             <img src="{{ recipe.image_url }}" alt="{{ recipe.title }}" class="img-fluid">
             <div class="card-body d-flex flex-column">
                 <h5 class="card-title">{{ recipe.title }}</h5>

@@ -45,6 +45,9 @@ a:hover {
   flex: 1 0 0;
 }
 
+.card {
+  max-width: 350px;
+}
 
 @media screen and (min-width: 450px) {
   body {
