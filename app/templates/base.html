@@ -31,8 +31,9 @@
 
           <!-- Barra de búsqueda: Siempre en el centro -->
           <!-- Se oculta en modo responsivo y se muestra debajo del logo -->
-          <form class="d-none d-sm-flex mx-2 mt-2 mt-lg-0 search-bar">
-            <input name="query" class="form-control me-2" type="search" placeholder="Buscar" aria-label="Search">
+          <form class="d-none d-sm-flex mx-2 mt-2 mt-lg-0 search-bar" role="search"
+            action="{{ url_for('main.search') }}" method="GET">
+            <input name="query" class="form-control me-2" type="search" placeholder="Buscar recetas..." aria-label="Search">
             <button class="btn btn-outline-success" type="submit">
               <i class="bi bi-search"></i>
             </button>

@@ -416,7 +416,8 @@ def update_recipe(recipe_id: int, recipe_data: dict, ingredients: list, steps: l
         return 1
 
 
-def get_recipes(page: int = 1, per_page: int = 20, category_id: int = None) -> tuple:
+def get_recipes(page: int = 1, per_page: int = 20, category_id: int = None,
+                search_query: str = None) -> tuple:
     """
     Obtiene las recetas de la base de datos, con paginación y opción de filtrar por categoría.
 
@@ -444,6 +445,12 @@ def get_recipes(page: int = 1, per_page: int = 20, category_id: int = None) -> t
     # Agregar condición de filtrado por categoría si se proporciona
     if category_id is not None:
         recipes_sql += " WHERE r.category_id = :category_id"
+    # Agregar condición de búsqueda si se proporciona
+    if search_query is not None:
+        recipes_sql += " WHERE r.title LIKE :search_query"
+        # El propósito de agregar los caracteres % es para permitir una búsqueda de patrones
+        # en una base de datos o en un conjunto de datos.
+        search_query = f"%{search_query}%"
 
     recipes_sql += """
     ORDER BY r.created_at DESC
@@ -454,12 +461,16 @@ def get_recipes(page: int = 1, per_page: int = 20, category_id: int = None) -> t
     count_sql = "SELECT COUNT(*) FROM recipes"
     if category_id is not None:
         count_sql += " WHERE category_id = :category_id"
+    if search_query is not None:
+        count_sql += " WHERE title LIKE :search_query"
 
     with db.engine.connect() as conn:
         # Preparar los parámetros para la consulta
         params = {"limit": per_page, "offset": offset}
         if category_id is not None:
             params["category_id"] = category_id
+        if search_query is not None:
+            params["search_query"] = search_query
 
         # Ejecutar la consulta para obtener las recetas
         result = conn.execute(text(recipes_sql), params)
@@ -470,5 +481,8 @@ def get_recipes(page: int = 1, per_page: int = 20, category_id: int = None) -> t
         params = {}
         if category_id:
             params['category_id'] = category_id
+        if search_query:
+            params['search_query'] = search_query
         total_count = conn.execute(text(count_sql), params).scalar()
+
     return recipes, total_count

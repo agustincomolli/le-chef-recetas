@@ -226,6 +226,38 @@ def view_recipe(recipe_id):
     return render_template("view-recipe.html", recipe=recipe)
 
 
+@main.route("/search", methods=["GET"])
+def search():
+    """
+    Maneja la búsqueda de recetas en la aplicación.
+
+    Obtiene los parámetros de búsqueda de la URL, como la consulta de búsqueda, 
+    el número de página y la cantidad de resultados por página. Luego, utiliza 
+    estos parámetros para obtener las recetas que coinciden con la búsqueda y 
+    renderiza la plantilla de índice con los resultados.
+
+    Parámetros:
+        query (str): La consulta de búsqueda.
+        page (int): El número de página.
+        per_page (int): La cantidad de resultados por página.
+
+    Retorna:
+        Response: La plantilla de índice renderizada con los resultados de la búsqueda.
+    """
+    query = request.args.get("query")
+    page = request.args.get("page", 1, type=int)
+    per_page = 20
+
+    recipes, total_count = get_recipes(page, per_page, search_query=query)
+    total_pages = ceil(total_count / per_page)
+
+    return render_template('search.html',
+                           recipes=recipes,
+                           query=query,
+                           page=page,
+                           total_pages=total_pages)
+
+
 def validate_recipe(recipe: dict, ingredients: list, steps: list) -> tuple:
     """
     Valida los datos de una receta, incluyendo sus ingredientes y pasos.
