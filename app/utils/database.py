@@ -355,6 +355,45 @@ def add_recipe(recipe_data: dict, ingredients: list, steps: list) -> int:
         return 1
 
 
+def delete_recipe(recipe_id: int, user_id: int) -> int:
+    """
+    Elimina una receta de la base de datos.
+
+    Args:
+        recipe_id (int): El ID de la receta a eliminar.
+        user_id (int): El ID del usuario que intenta eliminar la receta.
+
+    Returns:
+        int: 0 si la operación es exitosa, 1 si hay un error.
+    """
+    try:
+        with db.engine.begin() as conn:
+            # Verificar que la receta pertenece al usuario
+            verify_sql = "SELECT id FROM recipes WHERE id = :recipe_id AND user_id = :user_id"
+            result = conn.execute(
+                text(verify_sql), {"recipe_id": recipe_id, "user_id": user_id}).fetchone()
+
+            if not result:
+                # La receta no existe o no pertenece al usuario
+                return 1
+
+            # Eliminar los ingredientes y pasos asociados
+            conn.execute(text("DELETE FROM ingredients WHERE recipe_id = :recipe_id"), {
+                         "recipe_id": recipe_id})
+            conn.execute(text("DELETE FROM steps WHERE recipe_id = :recipe_id"), {
+                         "recipe_id": recipe_id})
+
+            # Eliminar la receta
+            delete_sql = "DELETE FROM recipes WHERE id = :recipe_id AND user_id = :user_id"
+            conn.execute(text(delete_sql), {
+                         "recipe_id": recipe_id, "user_id": user_id})
+
+        return 0
+    except SQLAlchemyError as e:
+        print(f"Error de base de datos al eliminar la receta: {e}")
+        return 1
+
+
 def update_recipe(recipe_id: int, recipe_data: dict, ingredients: list, steps: list) -> int:
     """
     Actualiza una receta existente en la base de datos.
@@ -417,15 +456,19 @@ def update_recipe(recipe_id: int, recipe_data: dict, ingredients: list, steps: l
 
 
 def get_recipes(page: int = 1, per_page: int = 20, category_id: int = None,
-                search_query: str = None) -> tuple:
+                search_query: str = None, user_id: int = None) -> tuple:
     """
-    Obtiene las recetas de la base de datos, con paginación y opción de filtrar por categoría.
+    Obtiene las recetas de la base de datos, con paginación y opción de filtrar por categoría y 
+    usuario.
 
     Args:
         page (int): Número de página actual. Por defecto es 1.
         per_page (int): Cantidad de recetas por página. Por defecto es 20.
-        category_id (int): ID de la categoría para filtrar. Si es None, se obtienen todas 
-        las recetas.
+        category_id (int): ID de la categoría para filtrar. Si es None, se obtienen todas las 
+        recetas.
+        search_query (str): Consulta de búsqueda para filtrar recetas por título.
+        user_id (int): ID del usuario para filtrar sus recetas. Si es None, se obtienen todas las 
+        recetas.
 
     Returns:
         tuple: Una tupla que contiene:
@@ -451,6 +494,12 @@ def get_recipes(page: int = 1, per_page: int = 20, category_id: int = None,
         # El propósito de agregar los caracteres % es para permitir una búsqueda de patrones
         # en una base de datos o en un conjunto de datos.
         search_query = f"%{search_query}%"
+    # Agregar condición de filtrado por usuario si se proporciona
+    if user_id is not None:
+        if category_id is not None or search_query is not None:
+            recipes_sql += " AND r.user_id = :user_id"
+        else:
+            recipes_sql += " WHERE r.user_id = :user_id"
 
     recipes_sql += """
     ORDER BY r.created_at DESC
@@ -471,6 +520,8 @@ def get_recipes(page: int = 1, per_page: int = 20, category_id: int = None,
             params["category_id"] = category_id
         if search_query is not None:
             params["search_query"] = search_query
+        if user_id is not None:
+            params["user_id"] = user_id
 
         # Ejecutar la consulta para obtener las recetas
         result = conn.execute(text(recipes_sql), params)

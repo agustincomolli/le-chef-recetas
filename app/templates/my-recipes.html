@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block main %}
+<h1 class="mb-4">Mis Recetas</h1>
+
+{% if recipes %}
+<div class="row justify-content-center">
+  {% for recipe in recipes %}
+  <div class="mb-4 col-md-6 col-lg-4 col-xl-3 d-flex justify-content-center">
+    <div class="card h-100 w-100 mx-auto">
+      <img src="{{ recipe.image_url }}" class="card-img-top" alt="{{ recipe.title }}">
+      <div class="card-body">
+        <h5 class="card-title">{{ recipe.title }}</h5>
+        <p class="card-text">{{ recipe.description[:100] }}...</p>
+      </div>
+      <div class="card-footer">
+        <a href="{{ url_for('main.view_recipe', recipe_id=recipe.id) }}" class="btn btn-primary btn-sm btn-my-recipes-standard"><i class="bi bi-eye"></i> Ver</a>
+        <a href="{{ url_for('main.add_edit_recipe', recipe_id=recipe.id) }}" class="btn btn-secondary btn-sm btn-my-recipes-standard"><i class="bi bi-pencil"></i> Editar</a>
+        <button type="button" class="btn btn-danger btn-sm btn-my-recipes-standard" data-bs-toggle="modal"
+          data-bs-target="#deleteRecipeModal" data-recipe-id="{{ recipe.id }}"><i class="bi bi-trash"></i> Eliminar</button>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% else %}
+<div class="text-center mt-3">
+  <img src="{{ url_for('static', filename='images/no-recipes.webp') }}" width="300px" alt="No hay recetas"
+      class="img-fluid mb-4 rounded shadow-lg">
+      <p>No tienes recetas aún. ¿Por qué no <a href="{{ url_for('main.add_edit_recipe') }}">agregas una</a>?</p>
+</div>
+{% endif %}
+
+<!-- Modal de confirmación -->
+<div class="modal fade" id="deleteRecipeModal" tabindex="-1" aria-labelledby="deleteRecipeModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header bg-dark text-light rounded-0">
+        <h5 class="modal-title" id="deleteRecipeModalLabel">Confirmar eliminación de receta</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        ¿Estás seguro de que quieres eliminar esta receta? Esta acción no se puede deshacer.
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+        <form id="delete-recipe-form" action="/delete_recipe" method="post">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <input type="hidden" name="recipe_id" value="">
+          <button type="submit" class="btn btn-danger">Eliminar receta</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="{{ url_for('static', filename='/scripts/recipe-delete.js') }}"></script>
+{% endblock %}

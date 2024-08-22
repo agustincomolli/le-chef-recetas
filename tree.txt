@@ -27,6 +27,7 @@
 |   |   |   `-- favicon.png
 |   |   |-- images
 |   |   |   |-- 404.webp
+|   |   |   |-- angry-chef.webp
 |   |   |   |-- background.webp
 |   |   |   |-- chef-default.webp
 |   |   |   |-- contact-form.webp
@@ -34,6 +35,7 @@
 |   |   |   |-- drink.webp
 |   |   |   |-- le-chef.webp
 |   |   |   |-- main-dish.webp
+|   |   |   |-- no-recipes.webp
 |   |   |   |-- others.webp
 |   |   |   `-- starter-dish.webp
 |   |   |-- scripts
@@ -53,70 +55,93 @@
 |   |   |   |   |-- bootstrap.min.js
 |   |   |   |   `-- bootstrap.min.js.map
 |   |   |   |-- contact-validation.js
-|   |   |   |-- profile-image-loader.js
+|   |   |   |-- image-loader.js
+|   |   |   |-- print-recipe.js
 |   |   |   |-- recipe-form.js
 |   |   |   `-- recipe-validation.js
-|   |   `-- styles
-|   |       |-- bootstrap
-|   |       |   |-- bootstrap-grid.css
-|   |       |   |-- bootstrap-grid.css.map
-|   |       |   |-- bootstrap-grid.min.css
-|   |       |   |-- bootstrap-grid.min.css.map
-|   |       |   |-- bootstrap-grid.rtl.css
-|   |       |   |-- bootstrap-grid.rtl.css.map
-|   |       |   |-- bootstrap-grid.rtl.min.css
-|   |       |   |-- bootstrap-grid.rtl.min.css.map
-|   |       |   |-- bootstrap-icons.css
-|   |       |   |-- bootstrap-icons.min.css
-|   |       |   |-- bootstrap-original.min.css
-|   |       |   |-- bootstrap-reboot.css
-|   |       |   |-- bootstrap-reboot.css.map
-|   |       |   |-- bootstrap-reboot.min.css
-|   |       |   |-- bootstrap-reboot.min.css.map
-|   |       |   |-- bootstrap-reboot.rtl.css
-|   |       |   |-- bootstrap-reboot.rtl.css.map
-|   |       |   |-- bootstrap-reboot.rtl.min.css
-|   |       |   |-- bootstrap-reboot.rtl.min.css.map
-|   |       |   |-- bootstrap-utilities.css
-|   |       |   |-- bootstrap-utilities.css.map
-|   |       |   |-- bootstrap-utilities.min.css
-|   |       |   |-- bootstrap-utilities.min.css.map
-|   |       |   |-- bootstrap-utilities.rtl.css
-|   |       |   |-- bootstrap-utilities.rtl.css.map
-|   |       |   |-- bootstrap-utilities.rtl.min.css
-|   |       |   |-- bootstrap-utilities.rtl.min.css.map
-|   |       |   |-- bootstrap.css
-|   |       |   |-- bootstrap.css.map
-|   |       |   |-- bootstrap.min.css
-|   |       |   |-- bootstrap.min.css.map
-|   |       |   |-- bootstrap.rtl.css
-|   |       |   |-- bootstrap.rtl.css.map
-|   |       |   |-- bootstrap.rtl.min.css
-|   |       |   `-- bootstrap.rtl.min.css.map
-|   |       |-- partials
-|   |       |   |-- account.css
-|   |       |   |-- contact.css
-|   |       |   |-- error-404.css
-|   |       |   |-- login.css
-|   |       |   `-- recipe.css
-|   |       `-- styles.css
+|   |   |-- styles
+|   |   |   |-- bootstrap
+|   |   |   |   |-- bootstrap-grid.css
+|   |   |   |   |-- bootstrap-grid.css.map
+|   |   |   |   |-- bootstrap-grid.min.css
+|   |   |   |   |-- bootstrap-grid.min.css.map
+|   |   |   |   |-- bootstrap-grid.rtl.css
+|   |   |   |   |-- bootstrap-grid.rtl.css.map
+|   |   |   |   |-- bootstrap-grid.rtl.min.css
+|   |   |   |   |-- bootstrap-grid.rtl.min.css.map
+|   |   |   |   |-- bootstrap-icons.css
+|   |   |   |   |-- bootstrap-icons.min.css
+|   |   |   |   |-- bootstrap-original.min.css
+|   |   |   |   |-- bootstrap-reboot.css
+|   |   |   |   |-- bootstrap-reboot.css.map
+|   |   |   |   |-- bootstrap-reboot.min.css
+|   |   |   |   |-- bootstrap-reboot.min.css.map
+|   |   |   |   |-- bootstrap-reboot.rtl.css
+|   |   |   |   |-- bootstrap-reboot.rtl.css.map
+|   |   |   |   |-- bootstrap-reboot.rtl.min.css
+|   |   |   |   |-- bootstrap-reboot.rtl.min.css.map
+|   |   |   |   |-- bootstrap-utilities.css
+|   |   |   |   |-- bootstrap-utilities.css.map
+|   |   |   |   |-- bootstrap-utilities.min.css
+|   |   |   |   |-- bootstrap-utilities.min.css.map
+|   |   |   |   |-- bootstrap-utilities.rtl.css
+|   |   |   |   |-- bootstrap-utilities.rtl.css.map
+|   |   |   |   |-- bootstrap-utilities.rtl.min.css
+|   |   |   |   |-- bootstrap-utilities.rtl.min.css.map
+|   |   |   |   |-- bootstrap.css
+|   |   |   |   |-- bootstrap.css.map
+|   |   |   |   |-- bootstrap.min.css
+|   |   |   |   |-- bootstrap.min.css.map
+|   |   |   |   |-- bootstrap.rtl.css
+|   |   |   |   |-- bootstrap.rtl.css.map
+|   |   |   |   |-- bootstrap.rtl.min.css
+|   |   |   |   `-- bootstrap.rtl.min.css.map
+|   |   |   |-- partials
+|   |   |   |   |-- account.css
+|   |   |   |   |-- contact.css
+|   |   |   |   |-- error-404.css
+|   |   |   |   |-- login.css
+|   |   |   |   |-- recipe.css
+|   |   |   |   `-- view-recipe.css
+|   |   |   `-- styles.css
+|   |   `-- uploads
+|   |       |-- 20240812101655_9a0fe0fa.webp
+|   |       |-- 20240813104912_23159939.webp
+|   |       |-- 20240821104802_6ecc29e7.webp
+|   |       |-- 20240821105426_65743b7f.webp
+|   |       |-- 20240821105810_5cbd978d.webp
+|   |       |-- 20240821110412_953d907f.webp
+|   |       |-- 20240821111625_5e19a9f1.webp
+|   |       |-- 20240821112848_c65f767f.webp
+|   |       `-- 20240821113616_addd572c.webp
 |   |-- templates
 |   |   |-- account.html
 |   |   |-- apology.html
 |   |   |-- base.html
 |   |   |-- contact.html
 |   |   |-- error-404.html
+|   |   |-- index.html
 |   |   |-- login.html
 |   |   |-- recipe-form.html
 |   |   |-- register.html
-|   |   `-- test.html
+|   |   |-- search.html
+|   |   |-- test.html
+|   |   `-- view-recipe.html
 |   `-- utils
 |       |-- database.py
 |       `-- helpers.py
+|-- datos_only.sql
+|-- flask_session
+|   |-- 2029240f6d1128be89ddc32729463129
+|   |-- 2a71183d15226fa31fa1de012b2b4ffb
+|   |-- 9f7e3b606549da0e3f7dddbfc6ebcfb6
+|   |-- a37fb49c77b950d9c4ef2415d48300d6
+|   |-- ea1af48fd0e90afd087fa0f929f3668c
+|   `-- eb4cb7f1af0ae10e5139aad062b41179
 |-- instance
 |-- requirements.txt
 |-- run.py
-|-- tree
+|-- schema.txt
 `-- tree.txt
 
-17 directories, 110 files
+18 directories, 126 files

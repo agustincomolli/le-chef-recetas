@@ -9,7 +9,7 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash
 from flask import session
 from app.utils.helpers import apology, login_required, save_image, allowed_file
 from app.utils.database import get_categories, get_recipe, add_recipe, update_recipe
-from app.utils.database import get_recipes
+from app.utils.database import get_recipes, delete_recipe
 
 # Códigos de error.
 ERROR_MUST_PROVIDE_TITLE = "Por favor, ingresa un título para tu receta."
@@ -18,6 +18,7 @@ ERROR_MUST_PROVIDE_CATEGORY = "Por favor, selecciona una categoría para tu rece
 ERROR_INVALID_SERVINGS = "Por favor, ingresa un número de porciones correcto (mínimo 1)."
 ERROR_MUST_PROVIDE_INGREDIENT = "Por favor, ingresa un ingrediente válido."
 ERROR_MUST_PROVIDE_STEP = "Debe haber al menos un paso en la preparación.."
+ERROR_DB_OPERATION = 1
 
 # Código OK
 CODE_OK = "ok"
@@ -156,6 +157,32 @@ def contact():
     return render_template("contact.html")
 
 
+@main.route("/delete_recipe/", methods=["POST"])
+@login_required
+def delete_recipe_route():
+    """
+    Elimina una receta específica del usuario actual.
+
+    Args:
+        No se reciben argumentos explícitos, pero se requiere que el usuario esté logueado
+        y que se envíe el ID de la receta a eliminar a través del formulario.
+
+    Returns:
+        Response: Un redireccionamiento a la página de recetas del usuario con un mensaje
+                  flash indicando el resultado de la operación.
+    """
+    user_id = session["user_id"]
+    recipe_id = int(request.form.get("recipe_id"))
+    result = delete_recipe(recipe_id, user_id)
+    if not result == ERROR_DB_OPERATION:
+        # Informar al usuario.
+        flash('Tu receta ha sido eliminada exitosamente.', 'success')
+        return redirect(url_for('main.my_recipes'))
+
+    flash('No se pudo eliminar la receta. Por favor, inténtalo de nuevo.', 'danger')
+    return redirect(url_for('main.my_recipes'))
+
+
 @main.route("/")
 @main.route("/category/<int:category_id>")
 def index(category_id=None):
@@ -195,6 +222,20 @@ def index(category_id=None):
                            categories=categories,
                            current_category=category_id,
                            current_category_name=current_category_name)
+
+
+@main.route("/my_recipes")
+@login_required
+def my_recipes():
+    """
+    Muestra las recetas del usuario actual.
+
+    Returns:
+        Response: Renderiza la plantilla 'my-recipes.html' con las recetas del usuario.
+    """
+    user_id = session["user_id"]
+    recipes, _ = get_recipes(user_id=user_id)
+    return render_template('my-recipes.html', recipes=recipes)
 
 
 @main.route("/recipe/view/<int:recipe_id>")
