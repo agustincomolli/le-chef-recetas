@@ -26,6 +26,17 @@ CODE_OK = "ok"
 main = Blueprint('main', __name__)
 
 
+@main.route("/about")
+def about():
+    """
+    Muestra la página de Acerca de.
+
+    Returns:
+    Renderiza la plantilla 'about.html'.
+    """
+    return render_template("about.html")
+
+
 @main.route("/recipe/<int:recipe_id>", methods=["GET", "POST"])
 @main.route("/recipe/new", methods=["GET", "POST"])
 @login_required

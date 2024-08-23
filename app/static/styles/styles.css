@@ -50,6 +50,13 @@ a:hover {
   max-width: 350px;
 }
 
+#nelson {
+  mask-image: linear-gradient(
+    black 80%,
+    transparent
+  );
+}
+
 @media screen and (min-width: 450px) {
   body {
     background-image: url("../images/background.webp");

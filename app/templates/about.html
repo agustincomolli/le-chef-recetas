@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block title %}
+Acerca de Le Chef
+{% endblock %}
+
+{% block main %}
+<div class="container">
+  <div class="row mb-4">
+    <div class="col-sm-4 d-flex justify-content-center justify-content-sm-end">
+      <img src="{{ url_for('static', filename='images/le-chef.webp') }}" alt="Imagen de cocina"
+        class="img-fluid my-auto" width="200px">
+    </div>
+    <div class="col-sm-7 text-start">
+      <h1>Acerca de Le Chef</h1>
+      <p>Le Chef es un sitio web donde puedes guardar y compartir tus recetas de cocina favoritas.</p>
+      <p>¿Eres un apasionado de la cocina? ¿Quieres compartir tus creaciones con otros? ¡Este es el lugar perfecto!</p>
+      <p>Nuestra misión es proporcionar un espacio para que los amantes de la cocina puedan compartir sus recetas,
+        consejos y experiencias. Queremos que te sientas como en casa, rodeado de personas que comparten tus pasiones.
+      </p>
+      <p>En Le Chef, podrás encontrar recetas de todo tipo, desde platos clásicos hasta creaciones innovadoras. También
+        podrás compartir tus propias recetas y conectarte con otros usuarios que compartan tus intereses.</p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="text-start d-flex justify-content-center">
+      <div  >
+        <h2>¿Qué puedes hacer en Le Chef?</h2>
+        <ul class="list-unstyled ms-3">
+          <li class="mb-2"><i class="bi bi-plus-circle me-3"></i>Guardar y compartir tus recetas favoritas</li>
+          <li class="mb-2"><i class="bi bi-search me-3"></i>Descubrir nuevas recetas y consejos de cocina</li>
+          <li class="mb-2"><i class="bi bi-share me-3"></i>Conectarte con otros usuarios que compartan tus intereses</li>
+          <li class="mb-2"><i class="bi bi-chat-left-text me-3"></i>Participar en discusiones y compartir tus experiencias</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
