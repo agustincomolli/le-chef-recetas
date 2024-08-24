@@ -11,6 +11,13 @@
   <script src="{{ url_for('static', filename='scripts/bootstrap/bootstrap.bundle.min.js') }}"></script>
   <!-- Mis estilos -->
   <link rel="stylesheet" href="{{ url_for('static', filename='/styles/styles.css') }}">
+  <!-- Metadatos para compartir la página en redes sociales y servicios de mensajería -->
+  <meta property="og:title" content="Le Chef Recetas">
+  <meta property="og:description" content="Un sitio web donde puedes guardar y compartir tus recetas de cocina favoritas.">
+  <meta property="og:image" content="{{ url_for('static', filename='images/le-chef.webp') }}">
+  <meta property="og:url" content="https://tudominio.com">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="{{ url_for('static', filename='images/le-chef.webp') }}">
 </head>
 <body class="d-flex flex-column justify-content-center min-vh-100">
   <header>
