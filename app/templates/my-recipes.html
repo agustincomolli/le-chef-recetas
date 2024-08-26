@@ -8,7 +8,7 @@
   {% for recipe in recipes %}
   <div class="mb-4 col-md-6 col-lg-4 col-xl-3 d-flex justify-content-center">
     <div class="card h-100 w-100 mx-auto">
-      <img src="{{ recipe.image_url }}" class="card-img-top" alt="{{ recipe.title }}">
+      <img src="{{ recipe.image_url }}" class="img-fluid" alt="{{ recipe.title }}">
       <div class="card-body">
         <h5 class="card-title">{{ recipe.title }}</h5>
         <p class="card-text">{{ recipe.description[:100] }}...</p>
