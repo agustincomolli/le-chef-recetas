@@ -107,7 +107,7 @@ Enlace del Proyecto: [https://github.com/agustincomolli/le-chef](https://github.
 
 Para ver la aplicación en acción, mira este video de demostración:
 
-[Insertar enlace de YouTube aquí]
+[Ver una demostración en YouTube](https://youtu.be/C7a9IaydeB0)
 
 ---
 
