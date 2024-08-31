@@ -490,7 +490,7 @@ def get_recipes(page: int = 1, per_page: int = 20, category_id: int = None,
         recipes_sql += " WHERE r.category_id = :category_id"
     # Agregar condición de búsqueda si se proporciona
     if search_query is not None:
-        recipes_sql += " WHERE r.title LIKE :search_query"
+        recipes_sql += " WHERE LOWER(r.title) LIKE :search_query"
         # El propósito de agregar los caracteres % es para permitir una búsqueda de patrones
         # en una base de datos o en un conjunto de datos.
         search_query = f"%{search_query}%"
