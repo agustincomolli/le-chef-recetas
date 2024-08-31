@@ -27,10 +27,10 @@ class Recipe(db.Model):
     __tablename__ = "recipes"
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(), nullable=False)
-    description = db.Column(db.String(100))
+    description = db.Column(db.String())
     created_at = db.Column(db.DateTime(), nullable=False,
                            server_default=db.func.current_timestamp())
-    image_url = db.Column(db.String(200), nullable=False)
+    image_url = db.Column(db.String(), nullable=False)
     servings = db.Column(db.Integer)
     prep_time = db.Column(db.Integer)
     prep_time_unit = db.Column(db.String(10))
